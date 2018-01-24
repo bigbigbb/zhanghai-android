@@ -1,7 +1,6 @@
 package com.caishi.zhanghai.im.ui.activity;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -24,7 +23,7 @@ import android.widget.Toast;
 import com.caishi.zhanghai.im.R;
 import com.caishi.zhanghai.im.SealConst;
 import com.caishi.zhanghai.im.SealUserInfoManager;
-import com.caishi.zhanghai.im.bean.FriendAllBean;
+import com.caishi.zhanghai.im.bean.BeanBean;
 import com.caishi.zhanghai.im.bean.FriendAllReturnBean;
 import com.caishi.zhanghai.im.bean.GetUserInfoBean;
 import com.caishi.zhanghai.im.bean.GetUserInfoReturnBean;
@@ -45,7 +44,6 @@ import com.caishi.zhanghai.im.server.widget.ClearWriteEditText;
 import com.caishi.zhanghai.im.server.widget.LoadDialog;
 import com.caishi.zhanghai.im.utils.MD5;
 import com.google.gson.Gson;
-import com.huawei.hms.support.api.entity.hwid.GetLoginInfoResult;
 
 import io.rong.imkit.RongIM;
 import io.rong.imlib.RongIMClient;
@@ -69,7 +67,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private String connectResultId;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
-    private String loginToken;
+    private String loginToken,loginAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -251,6 +249,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     if (loginReturnBean.getV().equals("ok")) {
                         if (null != loginReturnBean.getData()) {
                             loginToken = loginReturnBean.getData().getToken();
+                            loginAccount = loginReturnBean.getData().getAccount();
                             if (!TextUtils.isEmpty(loginToken)) {
                                 RongIM.connect(loginToken, new RongIMClient.ConnectCallback() {
                                     @Override
@@ -308,7 +307,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     };
 
     private void getAllFriendShip() {
-        FriendAllBean friendAllBean = new FriendAllBean();
+        BeanBean friendAllBean = new BeanBean();
         friendAllBean.setK("all");
         friendAllBean.setM("friend");
         friendAllBean.setRid(String.valueOf(System.currentTimeMillis()));
@@ -497,6 +496,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     private void goToMain() {
         editor.putString("loginToken", loginToken);
+        editor.putString("loginAccount", loginAccount);
+
         editor.putString(SealConst.SEALTALK_LOGING_PHONE, phoneString);
         editor.putString(SealConst.SEALTALK_LOGING_PASSWORD, passwordString);
         editor.apply();

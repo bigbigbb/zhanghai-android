@@ -4,7 +4,7 @@ package com.caishi.zhanghai.im.bean;
  * Created by yusy on 2017/12/30.
  */
 
-public class FriendAllBean {
+public class BeanBean {
 
     /**
      * rid : xxyy

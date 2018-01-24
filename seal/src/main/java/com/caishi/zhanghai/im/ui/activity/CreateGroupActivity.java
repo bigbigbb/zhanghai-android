@@ -11,6 +11,11 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 
+import com.caishi.zhanghai.im.bean.CreateGroupBean;
+import com.caishi.zhanghai.im.bean.CreateGroupReturnBean;
+import com.caishi.zhanghai.im.net.CallBackJson;
+import com.caishi.zhanghai.im.net.SocketClient;
+import com.google.gson.Gson;
 import com.qiniu.android.http.ResponseInfo;
 import com.qiniu.android.storage.UpCompletionHandler;
 import com.qiniu.android.storage.UploadManager;
@@ -130,7 +135,8 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
                 }
                 if (groupIds.size() > 1) {
                     LoadDialog.show(mContext);
-                    request(CREATE_GROUP, true);
+//                    request(CREATE_GROUP, true);
+                    createGroup();
                 }
 
                 break;
@@ -138,6 +144,41 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
     }
 
 
+    /**
+     *   "is_join_via_pay":"1", //是否开启付费入群功能,1或0
+     "join_amount":"10.00", //入群费用10.00元,上面开关是0的话则这里填0.00
+     "is_recheck_paid":"0", //用户付费后是否需要审核才能入群,0则付费直接入群
+     "is_view_each":"0", //群成员是否可以点开其他成员头像查看资料
+     "is_invite_each":"0", //群成员是否可以发送添加好友给其他成员
+     */
+    private void createGroup(){
+        CreateGroupBean createGroupBean = new CreateGroupBean();
+        createGroupBean.setK("create");
+        createGroupBean.setM("group");
+        createGroupBean.setRid(String.valueOf(System.currentTimeMillis()));
+        CreateGroupBean.VBean vBean = new CreateGroupBean.VBean();
+        vBean.setGroupMemberList(groupIds);
+        vBean.setGroupName(mGroupName);
+        vBean.setIs_join_via_pay("1");
+        vBean.setJoin_amount("10.00");
+        vBean.setIs_recheck_paid("0");
+        vBean.setIs_view_each("0");
+        vBean.setIs_invite_each("0");
+        createGroupBean.setV(vBean);
+
+        String msg = new Gson().toJson(createGroupBean);
+        SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
+            @Override
+            public void returnJson(String json) {
+                CreateGroupReturnBean  createGroupReturnBean = new Gson().fromJson(json,CreateGroupReturnBean.class);
+                if(null!=createGroupReturnBean){
+
+                }
+
+            }
+        });
+
+    }
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
         switch (requestCode) {

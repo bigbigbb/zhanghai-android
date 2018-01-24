@@ -55,14 +55,15 @@ public class UpLoadPictureBean {
          * imgbase64 : base64(图片内容)
          */
 
-        private String imgbase64;
+        private String portraitUri;
 
-        public String getImgbase64() {
-            return imgbase64;
+
+        public String getPortraitUri() {
+            return portraitUri;
         }
 
-        public void setImgbase64(String imgbase64) {
-            this.imgbase64 = imgbase64;
+        public void setPortraitUri(String portraitUri) {
+            this.portraitUri = portraitUri;
         }
     }
 }

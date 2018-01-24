@@ -16,8 +16,7 @@ import java.io.File;
 import com.caishi.zhanghai.im.R;
 import com.caishi.zhanghai.im.SealConst;
 import com.caishi.zhanghai.im.bean.BaseReturnBean;
-import com.caishi.zhanghai.im.bean.FriendAllBean;
-import com.caishi.zhanghai.im.bean.FriendAllReturnBean;
+import com.caishi.zhanghai.im.bean.BeanBean;
 import com.caishi.zhanghai.im.net.CallBackJson;
 import com.caishi.zhanghai.im.net.SocketClient;
 import com.caishi.zhanghai.im.server.broadcast.BroadcastManager;
@@ -168,7 +167,7 @@ public class AccountSettingActivity extends BaseActivity implements View.OnClick
     }
 
     private void logout(){
-        FriendAllBean friendAllBean = new FriendAllBean();
+        BeanBean friendAllBean = new BeanBean();
         friendAllBean.setK("logout");
         friendAllBean.setM("member");
         friendAllBean.setRid(String.valueOf(System.currentTimeMillis()));

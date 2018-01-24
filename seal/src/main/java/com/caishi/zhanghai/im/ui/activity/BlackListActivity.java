@@ -17,10 +17,8 @@ import java.util.List;
 
 import com.caishi.zhanghai.im.App;
 import com.caishi.zhanghai.im.R;
-import com.caishi.zhanghai.im.SealUserInfoManager;
 import com.caishi.zhanghai.im.bean.BlackReturnBean;
-import com.caishi.zhanghai.im.bean.FriendAllBean;
-import com.caishi.zhanghai.im.bean.FriendAllReturnBean;
+import com.caishi.zhanghai.im.bean.BeanBean;
 import com.caishi.zhanghai.im.net.CallBackJson;
 import com.caishi.zhanghai.im.net.SocketClient;
 import com.caishi.zhanghai.im.server.widget.LoadDialog;
@@ -29,7 +27,6 @@ import com.caishi.zhanghai.im.ui.widget.SinglePopWindow;
 import com.google.gson.Gson;
 
 import io.rong.imageloader.core.ImageLoader;
-import io.rong.imlib.model.UserInfo;
 
 public class BlackListActivity extends BaseActivity {
 
@@ -83,7 +80,7 @@ public class BlackListActivity extends BaseActivity {
     }
 
     public void  getBlackList(){
-        FriendAllBean friendAllBean = new FriendAllBean();
+        BeanBean friendAllBean = new BeanBean();
         friendAllBean.setK("black_list");
         friendAllBean.setM("friend");
         friendAllBean.setRid(String.valueOf(System.currentTimeMillis()));

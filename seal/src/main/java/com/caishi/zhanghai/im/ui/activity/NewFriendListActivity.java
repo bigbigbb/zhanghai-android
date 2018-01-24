@@ -21,10 +21,9 @@ import java.util.List;
 import com.caishi.zhanghai.im.R;
 import com.caishi.zhanghai.im.SealAppContext;
 import com.caishi.zhanghai.im.SealUserInfoManager;
-import com.caishi.zhanghai.im.bean.AddFriendReturnBean;
 import com.caishi.zhanghai.im.bean.AgreeFriendBean;
 import com.caishi.zhanghai.im.bean.AgreeFriendReturnBean;
-import com.caishi.zhanghai.im.bean.FriendAllBean;
+import com.caishi.zhanghai.im.bean.BeanBean;
 import com.caishi.zhanghai.im.bean.FriendAllReturnBean;
 import com.caishi.zhanghai.im.db.Friend;
 import com.caishi.zhanghai.im.net.CallBackJson;
@@ -81,7 +80,7 @@ public class NewFriendListActivity extends BaseActivity implements NewFriendList
 
 
     private  void   getAllFriendShip(){
-        FriendAllBean friendAllBean = new FriendAllBean();
+        BeanBean friendAllBean = new BeanBean();
         friendAllBean.setK("all");
         friendAllBean.setM("friend");
         friendAllBean.setRid(String.valueOf(System.currentTimeMillis()));

@@ -161,6 +161,12 @@ public class SplashActivity extends Activity {
                     Toast.makeText(getApplication(), loginReturnBean.getDesc(), Toast.LENGTH_LONG).show();
                     if (loginReturnBean.getV().equals("ok")) {
                         if (null != loginReturnBean.getData()) {
+                            String loginToken = loginReturnBean.getData().getToken();
+                            String loginAccount = loginReturnBean.getData().getAccount();
+                            SharedPreferences.Editor editor = getSharedPreferences("config", MODE_PRIVATE).edit();
+                            editor.putString("loginToken", loginToken);
+                            editor.putString("loginAccount", loginAccount);
+                            editor.apply();
                             RongIM.connect(loginReturnBean.getData().getToken(), SealAppContext.getInstance().getConnectCallback());
                             if(isFrom){
                                 goToMain();

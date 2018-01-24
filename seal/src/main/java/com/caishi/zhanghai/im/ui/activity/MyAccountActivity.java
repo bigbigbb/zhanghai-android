@@ -25,9 +25,12 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.caishi.zhanghai.im.bean.HeadPicRetrunBean;
+import com.caishi.zhanghai.im.bean.UpLoadPicReBean;
 import com.caishi.zhanghai.im.bean.UpLoadPictureBean;
 import com.caishi.zhanghai.im.bean.UpLoadPictureReturnBean;
 import com.caishi.zhanghai.im.net.CallBackJson;
+import com.caishi.zhanghai.im.net.ReqSSl;
 import com.caishi.zhanghai.im.net.SocketClient;
 import com.google.gson.Gson;
 import com.qiniu.android.http.ResponseInfo;
@@ -39,6 +42,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.HashMap;
 
 import com.caishi.zhanghai.im.App;
 import com.caishi.zhanghai.im.R;
@@ -131,7 +135,7 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
 
     public static String convertIconToString(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();// outputstream
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 50, baos);
         byte[] appicon = baos.toByteArray();// 转为byte数组
         return Base64.encodeToString(appicon, Base64.DEFAULT);
     }
@@ -147,7 +151,8 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
                     selectUri = uri;
                     LoadDialog.show(mContext);
 //                    request(GET_QI_NIU_TOKEN);
-                    uploadPicture();
+//                    uploadPicture();
+                    uploadPic();
                 }
             }
 
@@ -158,6 +163,36 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
         });
     }
 
+    private void uploadPic(){
+        String cacheToken = sp.getString("loginToken", "");
+        String cacheAccount = sp.getString("loginAccount", "");
+        HashMap<String,Object> hashMap = new HashMap<>();
+        hashMap.put("account",cacheAccount);
+        hashMap.put("token",cacheToken);
+        hashMap.put("avatar",baseString);
+        ReqSSl.getInstance().requestPost(getApplication(),"http://zhanghai.looklaw.cn/upload/avatar/",hashMap,new ReqSSl.ReqListener(){
+            @Override
+            public void success(String response) {
+                Log.e("response",response);
+                if(response.contains("200")){
+                    UpLoadPicReBean upLoadPicReBean = new Gson().fromJson(response,UpLoadPicReBean.class);
+                    String  portrait = upLoadPicReBean.getData().getPortraitUri();
+                    uploadPicture(portrait);
+
+                }else {
+
+                }
+
+
+            }
+
+            @Override
+            public void failed() {
+
+            }
+        });
+
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         finish();
@@ -183,7 +218,9 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
             case UP_LOAD_PORTRAIT:
 //                return action.setPortrait(imageUrl);
             case GET_QI_NIU_TOKEN:
-                return action.getQiNiuToken();
+                String cacheToken = sp.getString("loginToken", "");
+                String cacheAccount = sp.getString("loginAccount", "");
+                return action.getPortraitUri(cacheToken,cacheAccount,baseString);
         }
         return super.doInBackground(requestCode, id);
     }
@@ -207,9 +244,12 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
 //                    LoadDialog.dismiss(mContext);
                     break;
                 case GET_QI_NIU_TOKEN:
-                    QiNiuTokenResponse response = (QiNiuTokenResponse) result;
-                    if (response.getCode() == 200) {
-                        uploadImage(response.getResult().getDomain(), response.getResult().getToken(), selectUri);
+//                    QiNiuTokenResponse response = (QiNiuTokenResponse) result;
+//                    if (response.getCode() == 200) {
+//                        uploadImage(response.getResult().getDomain(), response.getResult().getToken(), selectUri);
+//                    }
+                    HeadPicRetrunBean bean = (HeadPicRetrunBean)result;
+                    if (bean.getCode() == 200) {
                     }
                     break;
             }
@@ -315,13 +355,13 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
     }
 
 
-    private void uploadPicture() {
+    private void uploadPicture(String portraitUri) {
         UpLoadPictureBean upLoadPictureBean = new UpLoadPictureBean();
         upLoadPictureBean.setK("portrait");
         upLoadPictureBean.setM("member");
         upLoadPictureBean.setRid(String.valueOf(System.currentTimeMillis()));
         UpLoadPictureBean.VBean vBean = new UpLoadPictureBean.VBean();
-        vBean.setImgbase64(baseString);
+        vBean.setPortraitUri(portraitUri);
         upLoadPictureBean.setV(vBean);
         String msg = new Gson().toJson(upLoadPictureBean);
         SocketClient.getInstance().sendMessage(msg, new CallBackJson() {

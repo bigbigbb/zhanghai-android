@@ -53,7 +53,6 @@
     </RelativeLayout>
 
     <View
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="0.1dp"
         android:layout_marginLeft="12dp"
@@ -61,7 +60,6 @@
         android:background="#d9d9d9" />
 
     <RelativeLayout
-        android:visibility="gone"
         android:id="@+id/re_chatroom"
         android:layout_width="match_parent"
         android:layout_height="52dp"

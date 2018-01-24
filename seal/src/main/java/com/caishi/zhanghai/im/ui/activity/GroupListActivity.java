@@ -4,9 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +26,17 @@ import com.caishi.zhanghai.im.App;
 import com.caishi.zhanghai.im.R;
 import com.caishi.zhanghai.im.SealConst;
 import com.caishi.zhanghai.im.SealUserInfoManager;
+import com.caishi.zhanghai.im.bean.BaseReturnBean;
+import com.caishi.zhanghai.im.bean.BeanBean;
+import com.caishi.zhanghai.im.bean.GroupListReturnBean;
 import com.caishi.zhanghai.im.db.Groups;
+import com.caishi.zhanghai.im.net.CallBackJson;
+import com.caishi.zhanghai.im.net.SocketClient;
 import com.caishi.zhanghai.im.server.broadcast.BroadcastManager;
+import com.caishi.zhanghai.im.server.utils.NToast;
 import com.caishi.zhanghai.im.server.widget.SelectableRoundedImageView;
+import com.google.gson.Gson;
+
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 
@@ -52,6 +63,7 @@ public class GroupListActivity extends BaseActivity {
         mSearch = (EditText) findViewById(R.id.group_search);
         mTextView = (TextView)findViewById(R.id.foot_group_size);
         initData();
+        getAllGroup();
         BroadcastManager.getInstance(mContext).addAction(SealConst.GROUP_LIST_UPDATE, new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -105,6 +117,39 @@ public class GroupListActivity extends BaseActivity {
         });
     }
 
+
+    private void getAllGroup(){
+        BeanBean friendAllBean = new BeanBean();
+        friendAllBean.setK("all");
+        friendAllBean.setM("group");
+        friendAllBean.setRid(String.valueOf(System.currentTimeMillis()));
+        String msg = new Gson().toJson(friendAllBean);
+        SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
+            @Override
+            public void returnJson(String json) {
+                Log.e("msg1111", json);
+                GroupListReturnBean baseReturnBean = new Gson().fromJson(json, GroupListReturnBean.class);
+                if (null != baseReturnBean) {
+                    Message message = new Message();
+                    message.obj = baseReturnBean;
+                    handler.sendMessage(message);
+                }
+
+
+            }
+        });
+    }
+
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            GroupListReturnBean groupListReturnBean   =  (GroupListReturnBean) msg.obj;
+            if(null!=groupListReturnBean){
+            }
+
+        }
+    };
     private void filterData(String s) {
         List<Groups> filterDataList = new ArrayList<>();
         if (TextUtils.isEmpty(s)) {

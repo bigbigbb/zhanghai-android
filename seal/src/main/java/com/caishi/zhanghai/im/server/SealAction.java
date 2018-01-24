@@ -8,9 +8,11 @@ import android.util.Log;
 import org.apache.http.entity.StringEntity;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
 
 import com.caishi.zhanghai.im.bean.FriendAllReturnBean;
+import com.caishi.zhanghai.im.bean.HeadPicRetrunBean;
 import com.caishi.zhanghai.im.server.network.http.HttpException;
 import com.caishi.zhanghai.im.server.request.AddGroupMemberRequest;
 import com.caishi.zhanghai.im.server.request.AddToBlackListRequest;
@@ -835,6 +837,19 @@ public class SealAction extends BaseAction {
         QiNiuTokenResponse q = null;
         if (!TextUtils.isEmpty(result)) {
             q = jsonToBean(result, QiNiuTokenResponse.class);
+        }
+        return q;
+    }
+
+    public HeadPicRetrunBean getPortraitUri(String account,String token,String avatar) throws HttpException {
+        avatar = avatar.replaceAll("\\+","%2B");
+        avatar = avatar.replaceAll("/","%2F");
+        avatar = avatar.replaceAll("%","%25");
+        String url = "http://zhanghai.looklaw.cn/upload/avatar?"+"account="+account+"&token="+token+"&avatar="+avatar;
+        String result = httpManager.get(mContext,url);
+        HeadPicRetrunBean q = null;
+        if (!TextUtils.isEmpty(result)) {
+            q = jsonToBean(result, HeadPicRetrunBean.class);
         }
         return q;
     }

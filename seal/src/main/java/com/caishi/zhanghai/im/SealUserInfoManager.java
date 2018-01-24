@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -19,7 +18,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.caishi.zhanghai.im.bean.FriendAllBean;
 import com.caishi.zhanghai.im.bean.FriendAllReturnBean;
 import com.caishi.zhanghai.im.db.BlackList;
 import com.caishi.zhanghai.im.db.BlackListDao;
@@ -31,8 +29,6 @@ import com.caishi.zhanghai.im.db.GroupMemberDao;
 import com.caishi.zhanghai.im.db.Groups;
 import com.caishi.zhanghai.im.db.GroupsDao;
 import com.caishi.zhanghai.im.db.UserInfoBean;
-import com.caishi.zhanghai.im.net.CallBackJson;
-import com.caishi.zhanghai.im.net.SocketClient;
 import com.caishi.zhanghai.im.server.SealAction;
 import com.caishi.zhanghai.im.server.network.async.AsyncTaskManager;
 import com.caishi.zhanghai.im.server.network.async.OnDataListener;
@@ -43,10 +39,8 @@ import com.caishi.zhanghai.im.server.response.GetGroupInfoResponse;
 import com.caishi.zhanghai.im.server.response.GetGroupMemberResponse;
 import com.caishi.zhanghai.im.server.response.GetGroupResponse;
 import com.caishi.zhanghai.im.server.response.GetTokenResponse;
-import com.caishi.zhanghai.im.server.response.UserRelationshipResponse;
 import com.caishi.zhanghai.im.server.utils.NLog;
 import com.caishi.zhanghai.im.server.utils.RongGenerate;
-import com.google.gson.Gson;
 
 import io.rong.common.RLog;
 import io.rong.imkit.RongIM;

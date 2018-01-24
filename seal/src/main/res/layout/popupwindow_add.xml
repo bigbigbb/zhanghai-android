@@ -35,7 +35,6 @@
 
 
         <RelativeLayout
-            android:visibility="gone"
             android:id="@+id/re_addfriends"
             android:layout_width="match_parent"
             android:layout_height="49dp"
