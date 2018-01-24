@@ -32,6 +32,7 @@ import com.caishi.zhanghai.im.bean.UpLoadPictureReturnBean;
 import com.caishi.zhanghai.im.net.CallBackJson;
 import com.caishi.zhanghai.im.net.ReqSSl;
 import com.caishi.zhanghai.im.net.SocketClient;
+import com.caishi.zhanghai.im.utils.CommonUtils;
 import com.google.gson.Gson;
 import com.qiniu.android.http.ResponseInfo;
 import com.qiniu.android.storage.UpCompletionHandler;
@@ -118,27 +119,7 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
         });
     }
 
-    /* uri转化为bitmap */
-    private Bitmap getBitmapFromUri(Uri uri) {
-        try {
-           // 读取uri所在的图片
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(
-                    this.getContentResolver(), uri);
-            return bitmap;
-        } catch (Exception e) {
-            Log.e("[Android]", e.getMessage());
-            Log.e("[Android]", "目录为：" + uri);
-            e.printStackTrace();
-            return null;
-        }
-    }
 
-    public static String convertIconToString(Bitmap bitmap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();// outputstream
-        bitmap.compress(Bitmap.CompressFormat.PNG, 50, baos);
-        byte[] appicon = baos.toByteArray();// 转为byte数组
-        return Base64.encodeToString(appicon, Base64.DEFAULT);
-    }
 
     private String baseString;
 
@@ -147,7 +128,7 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
             @Override
             public void onPhotoResult(Uri uri) {
                 if (uri != null && !TextUtils.isEmpty(uri.getPath())) {
-                    baseString = convertIconToString(getBitmapFromUri(uri));
+                    baseString = CommonUtils.convertIconToString(CommonUtils.getBitmapFromUri(uri,getApplication()));
                     selectUri = uri;
                     LoadDialog.show(mContext);
 //                    request(GET_QI_NIU_TOKEN);
@@ -162,6 +143,7 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
             }
         });
     }
+    private String portraitUri;
 
     private void uploadPic(){
         String cacheToken = sp.getString("loginToken", "");
@@ -176,8 +158,8 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
                 Log.e("response",response);
                 if(response.contains("200")){
                     UpLoadPicReBean upLoadPicReBean = new Gson().fromJson(response,UpLoadPicReBean.class);
-                    String  portrait = upLoadPicReBean.getData().getPortraitUri();
-                    uploadPicture(portrait);
+                    portraitUri = upLoadPicReBean.getData().getPortraitUri();
+                    uploadPicture();
 
                 }else {
 
@@ -355,7 +337,7 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
     }
 
 
-    private void uploadPicture(String portraitUri) {
+    private void uploadPicture() {
         UpLoadPictureBean upLoadPictureBean = new UpLoadPictureBean();
         upLoadPictureBean.setK("portrait");
         upLoadPictureBean.setM("member");
@@ -385,12 +367,12 @@ public class MyAccountActivity extends BaseActivity implements View.OnClickListe
             super.handleMessage(msg);
             UpLoadPictureReturnBean upLoadPictureReturnBean = (UpLoadPictureReturnBean) msg.obj;
             if (upLoadPictureReturnBean.getV().equals("ok")) {
-                String imageUrl = upLoadPictureReturnBean.getData().getPortraitUri();
-                editor.putString(SealConst.SEALTALK_LOGING_PORTRAIT, imageUrl);
+//                String imageUrl = upLoadPictureReturnBean.getData().getPortraitUri();
+                editor.putString(SealConst.SEALTALK_LOGING_PORTRAIT, portraitUri);
                 editor.commit();
-                ImageLoader.getInstance().displayImage(imageUrl, mImageView, App.getOptions());
+                ImageLoader.getInstance().displayImage(portraitUri, mImageView, App.getOptions());
                 if (RongIM.getInstance() != null) {
-                    RongIM.getInstance().setCurrentUserInfo(new UserInfo(sp.getString(SealConst.SEALTALK_LOGIN_ID, ""), sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""), Uri.parse(imageUrl)));
+                    RongIM.getInstance().setCurrentUserInfo(new UserInfo(sp.getString(SealConst.SEALTALK_LOGIN_ID, ""), sp.getString(SealConst.SEALTALK_LOGIN_NAME, ""), Uri.parse(portraitUri)));
                 }
                 BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.CHANGEINFO);
                 NToast.shortToast(mContext, getString(R.string.portrait_update_success));

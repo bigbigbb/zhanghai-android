@@ -1,25 +1,22 @@
 package com.caishi.zhanghai.im.bean;
 
 /**
- * Created by yusy on 2018/1/3.
+ * Created by shihui on 2018/1/24.
  */
 
-public class UpLoadPictureReturnBean {
+public class QuitGroupBean {
 
     /**
      * rid : xxyy
-     * m : member
-     * k : portrait
-     * v : ok
-     * desc : 设置成功
-     * data : {"portraitUri":"http://xxx.xxx.jpg"}
+     * m : group
+     * k : quit
+     * v : {"groupId":"bdc59baa47627c4b38c43fe2fbc4f4ae"}
      */
 
     private String rid;
     private String m;
     private String k;
-    private String v;
-    private String desc;
+    private VBean v;
 
     public String getRid() {
         return rid;
@@ -45,19 +42,27 @@ public class UpLoadPictureReturnBean {
         this.k = k;
     }
 
-    public String getV() {
+    public VBean getV() {
         return v;
     }
 
-    public void setV(String v) {
+    public void setV(VBean v) {
         this.v = v;
     }
 
-    public String getDesc() {
-        return desc;
-    }
+    public static class VBean {
+        /**
+         * groupId : bdc59baa47627c4b38c43fe2fbc4f4ae
+         */
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+        private String groupId;
+
+        public String getGroupId() {
+            return groupId;
+        }
+
+        public void setGroupId(String groupId) {
+            this.groupId = groupId;
+        }
     }
 }

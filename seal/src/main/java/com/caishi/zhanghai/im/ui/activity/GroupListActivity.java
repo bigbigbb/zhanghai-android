@@ -50,7 +50,7 @@ public class GroupListActivity extends BaseActivity {
     private GroupAdapter adapter;
     private TextView mNoGroups;
     private EditText mSearch;
-    private List<Groups> mList;
+    private List<Groups> mList = new ArrayList<>();
     private TextView mTextView;
 
     @Override
@@ -146,6 +146,51 @@ public class GroupListActivity extends BaseActivity {
             super.handleMessage(msg);
             GroupListReturnBean groupListReturnBean   =  (GroupListReturnBean) msg.obj;
             if(null!=groupListReturnBean){
+                List<GroupListReturnBean.DataBean> listReturnBeans = groupListReturnBean.getData();
+                if(listReturnBeans.size()>0){
+                    Groups groups = null;
+                    for (GroupListReturnBean.DataBean dataBean:listReturnBeans){
+                        groups = new Groups();
+                        groups.setGroupsId(dataBean.getId());
+                        groups.setName(dataBean.getName());
+                        if(null!=groups.getPortraitUri()){
+                            groups.setPortraitUri(dataBean.getPortraitUri());
+                        }
+                        mList.add(groups);
+
+                    }
+                }
+                if (mList != null && mList.size() > 0) {
+                    adapter = new GroupAdapter(mContext, mList);
+                    mGroupListView.setAdapter(adapter);
+                    mNoGroups.setVisibility(View.GONE);
+                    mTextView.setVisibility(View.VISIBLE);
+                    mTextView.setText(getString(R.string.ac_group_list_group_number, mList.size()));
+                    mGroupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Groups bean = (Groups) adapter.getItem(position);
+                            RongIM.getInstance().startGroupChat(GroupListActivity.this, bean.getGroupsId(), bean.getName());
+                        }
+                    });
+                    mSearch.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            filterData(s.toString());
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                        }
+                    });
+                } else {
+                    mNoGroups.setVisibility(View.VISIBLE);
+                }
             }
 
         }

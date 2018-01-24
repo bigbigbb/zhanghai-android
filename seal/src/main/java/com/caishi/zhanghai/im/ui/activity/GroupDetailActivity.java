@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +20,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.caishi.zhanghai.im.bean.BaseReturnBean;
+import com.caishi.zhanghai.im.bean.QuitGroupBean;
+import com.caishi.zhanghai.im.net.CallBackJson;
+import com.caishi.zhanghai.im.net.SocketClient;
+import com.google.gson.Gson;
 import com.qiniu.android.http.ResponseInfo;
 import com.qiniu.android.storage.UpCompletionHandler;
 import com.qiniu.android.storage.UploadManager;
@@ -69,7 +76,6 @@ import io.rong.imkit.utilities.PromptPopupDialog;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Group;
-import io.rong.imlib.model.Message;
 import io.rong.imlib.model.UserInfo;
 
 /**
@@ -267,6 +273,74 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
         }
     }
 
+    private void quitGroup(){
+        QuitGroupBean quitGroupBean = new QuitGroupBean();
+        quitGroupBean.setK("quit");
+        quitGroupBean.setM("group");
+        quitGroupBean.setRid(String.valueOf(System.currentTimeMillis()));
+        QuitGroupBean.VBean vBean = new QuitGroupBean.VBean();
+        vBean.setGroupId(fromConversationId);
+        quitGroupBean.setV(vBean);
+        String msg = new Gson().toJson(quitGroupBean);
+        SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
+            @Override
+            public void returnJson(String json) {
+                Log.e("msg1111", json);
+                BaseReturnBean baseReturnBean = new Gson().fromJson(json, BaseReturnBean.class);
+                if (null != baseReturnBean) {
+                    Message message = new Message();
+                    message.obj = baseReturnBean;
+                    message.what =0;
+                    handler.sendMessage(message);
+                }
+
+
+            }
+        });
+
+    }
+
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case 0:
+                    BaseReturnBean baseReturnBean = (BaseReturnBean) msg.obj;
+                    NToast.longToast(getApplication(),baseReturnBean.getDesc());
+                    if(baseReturnBean.getV().equals("ok")){
+                        RongIM.getInstance().getConversation(Conversation.ConversationType.GROUP, fromConversationId, new RongIMClient.ResultCallback<Conversation>() {
+                            @Override
+                            public void onSuccess(Conversation conversation) {
+                                RongIM.getInstance().clearMessages(Conversation.ConversationType.GROUP, fromConversationId, new RongIMClient.ResultCallback<Boolean>() {
+                                    @Override
+                                    public void onSuccess(Boolean aBoolean) {
+                                        RongIM.getInstance().removeConversation(Conversation.ConversationType.GROUP, fromConversationId, null);
+                                    }
+
+                                    @Override
+                                    public void onError(RongIMClient.ErrorCode e) {
+
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onError(RongIMClient.ErrorCode e) {
+
+                            }
+                        });
+                        SealUserInfoManager.getInstance().deleteGroups(new Groups(fromConversationId));
+                        SealUserInfoManager.getInstance().deleteGroupMembers(fromConversationId);
+                        BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.GROUP_LIST_UPDATE);
+                        setResult(501, new Intent());
+                        LoadDialog.dismiss(mContext);
+                        finish();
+                    }
+                    break;
+            }
+        }
+    };
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
         switch (requestCode) {
@@ -454,7 +528,8 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
                     @Override
                     public void executeEvent() {
                         LoadDialog.show(mContext);
-                        request(QUIT_GROUP);
+//                        request(QUIT_GROUP);
+                        quitGroup();
                     }
 
                     @Override
@@ -490,7 +565,7 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
             case R.id.ac_ll_search_chatting_records:
                 Intent searchIntent = new Intent(GroupDetailActivity.this, SealSearchChattingDetailActivity.class);
                 searchIntent.putExtra("filterString", "");
-                ArrayList<Message> arrayList = new ArrayList<>();
+                ArrayList<io.rong.imlib.model.Message> arrayList = new ArrayList<>();
                 searchIntent.putParcelableArrayListExtra("filterMessages", arrayList);
                 mResult = new SealSearchConversationResult();
                 Conversation conversation = new Conversation();
