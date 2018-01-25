@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
@@ -19,8 +20,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.caishi.zhanghai.im.bean.BaseReturnBean;
+import com.caishi.zhanghai.im.bean.BeanBean;
+import com.caishi.zhanghai.im.bean.GroupListReturnBean;
 import com.caishi.zhanghai.im.bean.QuitGroupBean;
 import com.caishi.zhanghai.im.net.CallBackJson;
 import com.caishi.zhanghai.im.net.SocketClient;
@@ -147,8 +151,25 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
         SealAppContext.getInstance().pushActivity(this);
 
         setGroupsInfoChangeListener();
+        getAllGroup();
     }
 
+    private void getAllGroup(){
+        BeanBean friendAllBean = new BeanBean();
+        friendAllBean.setK("all");
+        friendAllBean.setM("group");
+        friendAllBean.setRid(String.valueOf(System.currentTimeMillis()));
+        final String msg = new Gson().toJson(friendAllBean);
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                String  msgReturn = SocketClient.getInstance().sendAndread(msg);
+                Log.e("msgReturn",msgReturn);
+            }
+        }).start();
+
+    }
     private void getGroups() {
         SealUserInfoManager.getInstance().getGroupsByID(fromConversationId, new SealUserInfoManager.ResultCallback<Groups>() {
 
