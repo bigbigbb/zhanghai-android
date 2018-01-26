@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#ebebeb"
     android:orientation="vertical">
 
 
@@ -15,14 +16,12 @@
 
     <com.caishi.zhanghai.im.server.widget.ClearWriteEditText
         android:id="@+id/create_groupname"
+        android:padding="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="40dp"
-        android:layout_marginLeft="35dp"
-        android:layout_marginRight="35dp"
-        android:background="@null"
+        android:background="@android:color/white"
         android:layout_marginTop="80dp"
-        android:gravity="center"
         android:hint="@string/edit_group_name"
         android:maxLength="10" />
 

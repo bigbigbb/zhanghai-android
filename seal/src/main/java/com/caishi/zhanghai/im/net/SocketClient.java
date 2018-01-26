@@ -220,7 +220,7 @@ public class SocketClient {
                         if (length > 0) {
                             String message = new String(Arrays.copyOf(buffer,
                                     length)).trim();
-                            Log.e(TAG, message);
+                            Log.e(TAG, "message"+message);
                             if (!TextUtils.isEmpty(message) && message.equals("{\"rid\":\"0\",\"m\":\"system\",\"k\":\"ping\",\"v\":\"\"}")) {
                                 Log.e("test", "收到心跳检测");
                                 sendMsg(initHeartData());
@@ -246,37 +246,44 @@ public class SocketClient {
 
     }
 
-
-    public String sendAndread(String msg) {
-
-        String messageReturn = "";
-        if (null != mSocket && null != mSocket.get()) {
-            Socket socket = mSocket.get();
-            try {
-                if (!socket.isClosed() && !socket.isOutputShutdown()) {
-                    OutputStream os = socket.getOutputStream();
-                    String message = msg + "$~ZHANGHAI-END-POINT~$";
-                    os.write(message.getBytes());
-                    os.flush();
-                }
-
-                InputStream is = socket.getInputStream();
-                byte[] buffer = new byte[1024 * 4];
-                int length = is.read(buffer);
-                if (length > 0) {
-                    messageReturn = new String(Arrays.copyOf(buffer,
-                            length)).trim();
-                    Log.e(TAG, messageReturn);
-
-                    return messageReturn;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return messageReturn;
-    }
+//
+//    public String sendAndread(String msg) {
+//
+//        if(null!=mReadThread){
+//            mReadThread.release();
+//        }
+//
+//        String messageReturn = "";
+//        if (null != mSocket && null != mSocket.get()) {
+//            Socket socket = mSocket.get();
+//            try {
+//                if (!socket.isClosed() && !socket.isOutputShutdown()) {
+//                    OutputStream os = socket.getOutputStream();
+//                    String message = msg + "$~ZHANGHAI-END-POINT~$";
+//                    os.write(message.getBytes());
+//                    os.flush();
+//                }
+//
+//                InputStream is = socket.getInputStream();
+//                byte[] buffer = new byte[1024 * 4];
+//                int length = 0;
+//
+//                while (!socket.isClosed() && !socket.isInputShutdown()
+//                         && ((length = is.read(buffer)) != -1)) {
+//                    if (length > 0) {
+//                         messageReturn = new String(Arrays.copyOf(buffer,
+//                                length)).trim();
+//                        Log.e(TAG, "messageReturn"+messageReturn);
+//                        return messageReturn;
+//                    }
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        return messageReturn;
+//    }
 
 
 }

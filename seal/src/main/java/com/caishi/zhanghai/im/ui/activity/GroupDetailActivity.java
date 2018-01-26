@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.caishi.zhanghai.im.bean.BaseReturnBean;
 import com.caishi.zhanghai.im.bean.BeanBean;
+import com.caishi.zhanghai.im.bean.GroupInfoReturnBean;
 import com.caishi.zhanghai.im.bean.GroupListReturnBean;
 import com.caishi.zhanghai.im.bean.QuitGroupBean;
 import com.caishi.zhanghai.im.net.CallBackJson;
@@ -73,6 +74,7 @@ import com.caishi.zhanghai.im.server.widget.LoadDialog;
 import com.caishi.zhanghai.im.server.widget.SelectableRoundedImageView;
 import com.caishi.zhanghai.im.ui.widget.DemoGridView;
 import com.caishi.zhanghai.im.ui.widget.switchbutton.SwitchButton;
+
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.emoticon.AndroidEmoji;
@@ -151,25 +153,54 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
         SealAppContext.getInstance().pushActivity(this);
 
         setGroupsInfoChangeListener();
-        getAllGroup();
+        getGroupInfo();
+        getGroupMember();
     }
 
-    private void getAllGroup(){
-        BeanBean friendAllBean = new BeanBean();
-        friendAllBean.setK("all");
-        friendAllBean.setM("group");
-        friendAllBean.setRid(String.valueOf(System.currentTimeMillis()));
-        final String msg = new Gson().toJson(friendAllBean);
-        new Thread(new Runnable() {
+    private void getGroupInfo() {
+        QuitGroupBean groupBean = new QuitGroupBean();
+        groupBean.setK("info");
+        groupBean.setM("group");
+        groupBean.setRid(String.valueOf(System.currentTimeMillis()));
+        QuitGroupBean.VBean vBean = new QuitGroupBean.VBean();
+        vBean.setGroupId(fromConversationId);
+        groupBean.setV(vBean);
+        String msg = new Gson().toJson(groupBean);
 
+        SocketClient.getInstance().sendMsg(msg, new CallBackJson() {
             @Override
-            public void run() {
-                String  msgReturn = SocketClient.getInstance().sendAndread(msg);
-                Log.e("msgReturn",msgReturn);
-            }
-        }).start();
+            public void returnJson(String json) {
+                Log.e("json", json);
+                GroupInfoReturnBean groupInfoReturnBean = new Gson().fromJson(json, GroupInfoReturnBean.class);
+                if (null != groupInfoReturnBean) {
+                    Message message = new Message();
+                    message.what = 1;
+                    message.obj = groupInfoReturnBean;
+                    handler.sendMessage(message);
+                }
 
+            }
+        });
     }
+
+    private void  getGroupMember(){
+        QuitGroupBean groupBean = new QuitGroupBean();
+        groupBean.setK("members");
+        groupBean.setM("group");
+        groupBean.setRid(String.valueOf(System.currentTimeMillis()));
+        QuitGroupBean.VBean vBean = new QuitGroupBean.VBean();
+        vBean.setGroupId(fromConversationId);
+        groupBean.setV(vBean);
+        String msg = new Gson().toJson(groupBean);
+
+        SocketClient.getInstance().sendMsg(msg, new CallBackJson() {
+            @Override
+            public void returnJson(String json) {
+                Log.e("json", json);
+            }
+        });
+    }
+
     private void getGroups() {
         SealUserInfoManager.getInstance().getGroupsByID(fromConversationId, new SealUserInfoManager.ResultCallback<Groups>() {
 
@@ -294,7 +325,7 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
         }
     }
 
-    private void quitGroup(){
+    private void quitGroup() {
         QuitGroupBean quitGroupBean = new QuitGroupBean();
         quitGroupBean.setK("quit");
         quitGroupBean.setM("group");
@@ -311,7 +342,7 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
                 if (null != baseReturnBean) {
                     Message message = new Message();
                     message.obj = baseReturnBean;
-                    message.what =0;
+                    message.what = 0;
                     handler.sendMessage(message);
                 }
 
@@ -321,15 +352,15 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
 
     }
 
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
-                case 0:
+            switch (msg.what) {
+                case 0://退出群组
                     BaseReturnBean baseReturnBean = (BaseReturnBean) msg.obj;
-                    NToast.longToast(getApplication(),baseReturnBean.getDesc());
-                    if(baseReturnBean.getV().equals("ok")){
+                    NToast.longToast(getApplication(), baseReturnBean.getDesc());
+                    if (baseReturnBean.getV().equals("ok")) {
                         RongIM.getInstance().getConversation(Conversation.ConversationType.GROUP, fromConversationId, new RongIMClient.ResultCallback<Conversation>() {
                             @Override
                             public void onSuccess(Conversation conversation) {
@@ -359,9 +390,26 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
                         finish();
                     }
                     break;
+                case 1://获取群组消息
+                    GroupInfoReturnBean groupInfoReturnBean = (GroupInfoReturnBean)msg.obj;
+                    NToast.shortToast(getApplication(),groupInfoReturnBean.getDesc());
+                    if(groupInfoReturnBean.getV().equals("ok")){
+//                        GroupInfoReturnBean.DataBean dataBean = groupInfoReturnBean.getData();
+//                        if(!TextUtils.isEmpty(dataBean.getPortraitUri())){
+//                            mGroup.setPortraitUri(dataBean.getPortraitUri());
+//                        }
+//
+//                        mGroup.setName(dataBean.getName());
+//                        mGroup.setGroupsId(dataBean.getId());
+//
+//                        initGroupData();
+                    }
+
+                    break;
             }
         }
     };
+
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
         switch (requestCode) {

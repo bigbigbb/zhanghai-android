@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 
 import com.caishi.zhanghai.im.R;
 import com.caishi.zhanghai.im.ui.activity.SearchFriendActivity;
+import com.caishi.zhanghai.im.ui.activity.SearchGroupActivity;
 import com.caishi.zhanghai.im.ui.activity.SelectFriendsActivity;
 
 
@@ -49,6 +50,7 @@ public class MorePopWindow extends PopupWindow {
         RelativeLayout re_addfriends = (RelativeLayout) content.findViewById(R.id.re_addfriends);
         RelativeLayout re_chatroom = (RelativeLayout) content.findViewById(R.id.re_chatroom);
         RelativeLayout re_scanner = (RelativeLayout) content.findViewById(R.id.re_scanner);
+        RelativeLayout re_scanner1 = (RelativeLayout) content.findViewById(R.id.re_scanner1);
         re_addfriends.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -75,6 +77,13 @@ public class MorePopWindow extends PopupWindow {
             @Override
             public void onClick(View v) {
                 context.startActivity(new Intent(context, SearchFriendActivity.class));
+                MorePopWindow.this.dismiss();
+            }
+        });
+        re_scanner1.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                context.startActivity(new Intent(context, SearchGroupActivity.class));
                 MorePopWindow.this.dismiss();
             }
         });

@@ -134,7 +134,7 @@
     <string name="select_group_member">选择群组成员</string>
     <string name="remove_group_member">移除群组成员</string>
     <string name="add_group_member">添加群组成员</string>
-    <string name="edit_group_name">填写群名称(2-10字)</string>
+    <string name="edit_group_name">请填写群名称(2-10字)</string>
     <string name="create_group">创建群组</string>
     <string name="created_group">创建了群组</string>
     <string name="you">你</string>
@@ -256,6 +256,7 @@
     <string name="group_notice_post_confirm">该公告会通知全部群成员，是否发布？</string>
     <string name="group_notice_prefix">\@所有人\n</string>
     <string name="search_friend">添加好友</string>
+    <string name="search_f_group">添加群组</string>
     <string name="setdisplayname">设置备注</string>
     <string name="new_and_old_password">新旧密码一致</string>
     <string name="nickname_show">昵称:</string>
