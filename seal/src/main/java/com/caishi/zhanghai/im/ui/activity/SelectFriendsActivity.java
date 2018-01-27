@@ -2,8 +2,12 @@ package com.caishi.zhanghai.im.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,8 +32,14 @@ import com.caishi.zhanghai.im.App;
 import com.caishi.zhanghai.im.R;
 import com.caishi.zhanghai.im.SealConst;
 import com.caishi.zhanghai.im.SealUserInfoManager;
+import com.caishi.zhanghai.im.bean.BaseReturnBean;
+import com.caishi.zhanghai.im.bean.DeleteGroupMemberBean;
+import com.caishi.zhanghai.im.bean.GroupMembersReturnBean;
+import com.caishi.zhanghai.im.bean.QuitGroupBean;
 import com.caishi.zhanghai.im.db.Friend;
 import com.caishi.zhanghai.im.db.GroupMember;
+import com.caishi.zhanghai.im.net.CallBackJson;
+import com.caishi.zhanghai.im.net.SocketClient;
 import com.caishi.zhanghai.im.server.broadcast.BroadcastManager;
 import com.caishi.zhanghai.im.server.network.http.HttpException;
 import com.caishi.zhanghai.im.server.pinyin.CharacterParser;
@@ -42,6 +52,8 @@ import com.caishi.zhanghai.im.server.utils.NToast;
 import com.caishi.zhanghai.im.server.widget.DialogWithYesOrNoUtils;
 import com.caishi.zhanghai.im.server.widget.LoadDialog;
 import com.caishi.zhanghai.im.server.widget.SelectableRoundedImageView;
+import com.google.gson.Gson;
+
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.userInfoCache.RongUserInfoManager;
@@ -116,7 +128,8 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
         isAddGroupMember = getIntent().getBooleanExtra("isAddGroupMember", false);
         isDeleteGroupMember = getIntent().getBooleanExtra("isDeleteGroupMember", false);
         if (isAddGroupMember || isDeleteGroupMember) {
-            initGroupMemberList();
+//            initGroupMemberList();
+           getGroupMember();
         }
         addDisList = (ArrayList<UserInfo>) getIntent().getSerializableExtra("AddDiscuMember");
         deleDisList = (ArrayList<UserInfo>) getIntent().getSerializableExtra("DeleteDiscuMember");
@@ -133,6 +146,106 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
         initData();
     }
 
+    private void getGroupMember() {
+        QuitGroupBean groupBean = new QuitGroupBean();
+        groupBean.setK("members");
+        groupBean.setM("group");
+        groupBean.setRid(String.valueOf(System.currentTimeMillis()));
+        QuitGroupBean.VBean vBean = new QuitGroupBean.VBean();
+        vBean.setGroupId(groupId);
+        groupBean.setV(vBean);
+        String msg = new Gson().toJson(groupBean);
+
+        SocketClient.getInstance().sendMsg(msg, new CallBackJson() {
+            @Override
+            public void returnJson(String json) {
+                Log.e("json", json);
+                GroupMembersReturnBean groupMembersReturnBean = new Gson().fromJson(json, GroupMembersReturnBean.class);
+                if (null != groupMembersReturnBean) {
+                    Message message = new Message();
+                    message.obj = groupMembersReturnBean;
+                    message.what = 0;
+                    handler.sendMessage(message);
+                }
+            }
+        });
+    }
+
+    private void  deleteGroupMember(){
+        DeleteGroupMemberBean deleteGroupMemberBean = new DeleteGroupMemberBean();
+        deleteGroupMemberBean.setK("kick");
+        deleteGroupMemberBean.setM("group");
+        deleteGroupMemberBean.setRid(String.valueOf(System.currentTimeMillis()));
+        DeleteGroupMemberBean.VBean vBean = new DeleteGroupMemberBean.VBean();
+        vBean.setGroupId(groupId);
+        vBean.setMemberIds(startDisList);
+        deleteGroupMemberBean.setV(vBean);
+        String msg = new Gson().toJson(deleteGroupMemberBean);
+
+        SocketClient.getInstance().sendMsg(msg, new CallBackJson() {
+            @Override
+            public void returnJson(String json) {
+                Log.e("json", json);
+                BaseReturnBean baseReturnBean = new Gson().fromJson(json, BaseReturnBean.class);
+                if (null != baseReturnBean) {
+                    Message message = new Message();
+                    message.obj = baseReturnBean;
+                    message.what = 1;
+                    handler.sendMessage(message);
+                }
+            }
+        });
+    }
+    private Handler handler  = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case 0://获取群成员
+                    GroupMembersReturnBean groupMembersReturnBean = (GroupMembersReturnBean) msg.obj;
+                    NToast.longToast(getApplication(),groupMembersReturnBean.getDesc());
+                    if(groupMembersReturnBean.getV().equals("ok")){
+                        List<GroupMembersReturnBean.DataBean> dataBeanList = groupMembersReturnBean.getData();
+                        if (dataBeanList != null && dataBeanList.size() > 0) {
+                            if (isAddGroupMember) {
+                                addGroupMemberList  = new ArrayList<>();
+                                GroupMember groupMember = null;
+                                for (GroupMembersReturnBean.DataBean dataBean:dataBeanList){
+                                    groupMember = new GroupMember(dataBean.getUser().getId(),dataBean.getUser().getNickname(), Uri.parse((String) dataBean.getUser().getPortraitUri()));
+                                    addGroupMemberList.add(groupMember);
+                                }
+
+                                fillSourceDataListWithFriendsInfo();
+                            } else {
+                                deleteGroupMemberList  =new ArrayList<>();
+                                GroupMember groupMember = null;
+                                for (GroupMembersReturnBean.DataBean dataBean:dataBeanList){
+                                    groupMember = new GroupMember(dataBean.getUser().getId(),dataBean.getUser().getNickname(), Uri.parse((String) dataBean.getUser().getPortraitUri()));
+                                    deleteGroupMemberList.add(groupMember);
+                                }
+                                fillSourceDataListForDeleteGroupMember();
+                            }
+
+                        }
+
+                    }
+                    break;
+                case 1://删除群成员
+                    BaseReturnBean baseReturnBean = (BaseReturnBean) msg.obj;
+                    NToast.longToast(getApplication(),baseReturnBean.getDesc());
+                    if(baseReturnBean.getV().equals("ok")){
+                            Intent intent = new Intent();
+                            intent.putExtra("deleteMember", (Serializable) createGroupList);
+                            setResult(102, intent);
+                            LoadDialog.dismiss(mContext);
+                            finish();
+                    }
+
+                    break;
+            }
+
+        }
+    };
     private void initGroupMemberList() {
         SealUserInfoManager.getInstance().getGroupMembers(groupId, new SealUserInfoManager.ResultCallback<List<GroupMember>>() {
             @Override
@@ -563,6 +676,7 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
     }
 
 
+
     @Override
     public Object doInBackground(int requestCode, String id) throws HttpException {
         switch (requestCode) {
@@ -727,7 +841,8 @@ public class SelectFriendsActivity extends BaseActivity implements View.OnClickL
                             @Override
                             public void executeEvent() {
                                 LoadDialog.show(mContext);
-                                request(DELETE_GROUP_MEMBER);
+//                                request(DELETE_GROUP_MEMBER);
+                                deleteGroupMember();
                             }
 
                             @Override
