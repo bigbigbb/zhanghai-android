@@ -10,12 +10,16 @@ import android.os.Message;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.caishi.zhanghai.im.App;
@@ -25,6 +29,9 @@ import com.caishi.zhanghai.im.SealConst;
 import com.caishi.zhanghai.im.SealUserInfoManager;
 import com.caishi.zhanghai.im.bean.AddFriendBean;
 import com.caishi.zhanghai.im.bean.AddFriendReturnBean;
+import com.caishi.zhanghai.im.bean.BaseReturnBean;
+import com.caishi.zhanghai.im.bean.GroupMembersReturnBean;
+import com.caishi.zhanghai.im.bean.QuitGroupBean;
 import com.caishi.zhanghai.im.bean.SearchFriendBean;
 import com.caishi.zhanghai.im.bean.SearchFriendReturnBean;
 import com.caishi.zhanghai.im.bean.SearchGroupBean;
@@ -43,6 +50,8 @@ import com.caishi.zhanghai.im.server.widget.DialogWithYesOrNoUtils;
 import com.caishi.zhanghai.im.server.widget.LoadDialog;
 import com.caishi.zhanghai.im.server.widget.SelectableRoundedImageView;
 import com.google.gson.Gson;
+
+import java.util.List;
 
 import io.rong.imageloader.core.ImageLoader;
 import io.rong.imlib.model.UserInfo;
@@ -63,11 +72,12 @@ public class SearchGroupActivity extends BaseActivity {
 
     private Friend mFriend;
     private int searchType=0;//默认按群号码搜索
+    private ListView mLvResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
+        setContentView(R.layout.activity_search_group);
         setTitle((R.string.search_f_group));
 
         mEtSearch = (EditText) findViewById(R.id.search_edit);
@@ -77,6 +87,7 @@ public class SearchGroupActivity extends BaseActivity {
         mTvSearchName = (TextView) findViewById(R.id.ac_search_tv_name);
         mBtnSearch= (Button) findViewById(R.id.btn_search_group);
         searchImage = (SelectableRoundedImageView) findViewById(R.id.search_header);
+        mLvResult = (ListView) findViewById(R.id.search_group_lv_result);
         initListener();
 
     }
@@ -146,6 +157,31 @@ public class SearchGroupActivity extends BaseActivity {
 
     }
 
+    private void applyGroup(String id) {
+        QuitGroupBean groupBean = new QuitGroupBean();
+        groupBean.setK("apply");
+        groupBean.setM("group");
+        groupBean.setRid(String.valueOf(System.currentTimeMillis()));
+        QuitGroupBean.VBean vBean = new QuitGroupBean.VBean();
+        vBean.setGroupId(id);
+        groupBean.setV(vBean);
+        String msg = new Gson().toJson(groupBean);
+
+        SocketClient.getInstance().sendMsg(msg, new CallBackJson() {
+            @Override
+            public void returnJson(String json) {
+                Log.e("json", json);
+                BaseReturnBean baseReturnBean = new Gson().fromJson(json, BaseReturnBean.class);
+                if (null != baseReturnBean) {
+                    Message message = new Message();
+                    message.obj = baseReturnBean;
+                    message.what = 2;
+                    handler.sendMessage(message);
+                }
+            }
+        });
+    }
+
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -156,52 +192,11 @@ public class SearchGroupActivity extends BaseActivity {
                     LoadDialog.dismiss(mContext);
                     NToast.shortToast(mContext, searchGroupReturnBean.getDesc());
                     if (null != searchGroupReturnBean.getData()) {
+                        MyAdapter myAdapter = new MyAdapter(searchGroupReturnBean.getData());
+                        mLvResult.setAdapter(myAdapter);
 
                     }
 
-                    searchItem.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (isFriendOrSelf(mFriendId)) {
-                                Intent intent = new Intent(SearchGroupActivity.this, UserDetailActivity.class);
-                                intent.putExtra("friend", mFriend);
-                                intent.putExtra("type", CLICK_CONVERSATION_USER_PORTRAIT);
-                                startActivity(intent);
-                                SealAppContext.getInstance().pushActivity(SearchGroupActivity.this);
-                                return;
-                            }
-                            DialogWithYesOrNoUtils.getInstance().showEditDialog(mContext, getString(R.string.add_text), getString(R.string.add_friend), new DialogWithYesOrNoUtils.DialogCallBack() {
-                                @Override
-                                public void executeEvent() {
-
-                                }
-
-                                @Override
-                                public void updatePassword(String oldPassword, String newPassword) {
-
-                                }
-
-                                @Override
-                                public void executeEditEvent(String editText) {
-                                    if (!CommonUtils.isNetworkConnected(mContext)) {
-                                        NToast.shortToast(mContext, R.string.network_not_available);
-                                        return;
-                                    }
-                                    addFriendMessage = editText;
-                                    if (TextUtils.isEmpty(editText)) {
-                                        addFriendMessage = "我是" + getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_NAME, "");
-                                    }
-                                    if (!TextUtils.isEmpty(mFriendId)) {
-                                        LoadDialog.show(mContext);
-//                                        request(ADD_FRIEND);
-                                        addFriend();
-                                    } else {
-                                        NToast.shortToast(mContext, "id is null");
-                                    }
-                                }
-                            });
-                        }
-                    });
                     break;
 
                 case 1://添加好友
@@ -211,6 +206,13 @@ public class SearchGroupActivity extends BaseActivity {
                     LoadDialog.dismiss(mContext);
                     if(null!=dataBean){
 
+
+                    }
+                    break;
+                case 2://申请入群
+                    BaseReturnBean baseReturnBean = (BaseReturnBean) msg.obj;
+                    NToast.longToast(getApplication(), baseReturnBean.getDesc());
+                    if (baseReturnBean.getV().equals("ok")) {
 
                     }
                     break;
@@ -389,5 +391,52 @@ public class SearchGroupActivity extends BaseActivity {
             }
         }
         return false;
+    }
+
+    private class  MyAdapter extends BaseAdapter{
+        private List<SearchGroupReturnBean.DataBean>  dataBeanList;
+
+        public MyAdapter(List<SearchGroupReturnBean.DataBean> dataBeanList) {
+            this.dataBeanList = dataBeanList;
+        }
+
+        @Override
+        public int getCount() {
+            return dataBeanList.size();
+        }
+
+        @Override
+        public View getView(final int i, View view, ViewGroup viewGroup) {
+            view  =  getLayoutInflater().inflate(R.layout.activity_search_group_detail,viewGroup,false);
+            SelectableRoundedImageView selectableRoundedImageView  = (SelectableRoundedImageView)view.findViewById(R.id.search_item_header);
+            TextView search_item_name = (TextView) view.findViewById(R.id.search_item_name);
+            TextView search_item_owner = (TextView) view.findViewById(R.id.search_item_owner);
+            TextView search_item_count = (TextView) view.findViewById(R.id.search_item_count);
+            Button btn_search_group = (Button) view.findViewById(R.id.btn_search_group);
+            if(null!=dataBeanList&&dataBeanList.size()>0){
+                SearchGroupReturnBean.DataBean dataBean = dataBeanList.get(i);
+                ImageLoader.getInstance().displayImage(dataBean.getPortraitUri(), selectableRoundedImageView, App.getOptions());
+                search_item_name.setText(dataBean.getName());
+                search_item_owner.setText("群主："+dataBean.getCreatorName());
+                search_item_count.setText("群成员："+dataBean.getMemberCount());
+            }
+            btn_search_group.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    applyGroup(dataBeanList.get(i).getId());
+                }
+            });
+            return view;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return i;
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return dataBeanList.get(i);
+        }
     }
 }

@@ -187,6 +187,7 @@
     <string name="clear_failure">清除失败</string>
     <string name="change_group_info">更改群组信息</string>
     <string name="new_group_name">新的群名称</string>
+    <string name="new_group_nike">新的群昵称</string>
     <string name="update_success">更改成功</string>
     <string name="quit_success">退出成功</string>
     <string name="dismiss_success">解散成功</string>

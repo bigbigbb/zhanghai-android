@@ -20,6 +20,8 @@ public class GroupMember extends UserInfo {
     private String groupNameSpelling;
     private String groupPortraitUri;
 
+
+
     public GroupMember(String userId, String name, Uri portraitUri) {
         super(userId, name, portraitUri);
     }

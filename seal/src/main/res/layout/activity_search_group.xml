@@ -8,11 +8,44 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:textColor="@color/color_03a9f4"
+            android:id="@+id/ac_search_tv_number"
+            android:gravity="center"
+            android:text="按群号码查找"
+            android:layout_weight="4"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+        <TextView
+            android:textColor="@color/color_434343"
+            android:layout_margin="5dp"
+            android:layout_weight="0.1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+        <TextView
+            android:textColor="@color/color_434343"
+            android:id="@+id/ac_search_tv_name"
+            android:gravity="center"
+            android:text="按群名称查找"
+            android:layout_weight="4"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/color_434343"></View>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="64dp"
         android:layout_marginTop="20dp"
         android:background="#fff"
-        android:focusable="true"
-        android:focusableInTouchMode="true">
+        >
 
         <EditText
             android:id="@+id/search_edit"
@@ -21,55 +54,27 @@
             android:layout_gravity="center"
             android:layout_marginLeft="14dp"
             android:layout_marginRight="14dp"
-            android:drawableLeft="@drawable/sealtalk_search"
             android:drawablePadding="6dp"
-            android:hint="@string/ac_search_phone_number"
-            android:inputType="phone"
-            android:maxLength="11"
-            android:maxLines="1"/>
+            android:hint="请输入群号码/请输入群名称关键字"
+            android:maxLines="1" />
 
     </LinearLayout>
 
-
-    <LinearLayout
-        android:id="@+id/search_result"
+    <Button
+        android:id="@+id/btn_search_group"
+        android:textSize="18sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="1px"
-        android:background="#fff"
-        android:orientation="horizontal"
-        android:visibility="gone">
+        android:layout_marginLeft="30dip"
+        android:layout_marginRight="30dip"
+        android:layout_marginTop="14dip"
+        android:background="@drawable/rs_select_btn_blue"
+        android:text="确认搜索"
+        android:textColor="#FFFFFF" />
 
-        <com.caishi.zhanghai.im.server.widget.SelectableRoundedImageView
-            android:id="@+id/search_header"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_margin="10dp"
-            android:layout_marginLeft="6dp"
-            android:scaleType="centerCrop"
-            app:sriv_left_bottom_corner_radius="3dip"
-            app:sriv_left_top_corner_radius="3dip"
-            app:sriv_right_bottom_corner_radius="3dip"
-            app:sriv_right_top_corner_radius="3dip" />
-
-        <TextView
-            android:id="@+id/search_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="10dp"
-            android:layout_weight="1"
-            android:maxLines="1"
-            android:textColor="@color/group_list_gray"
-            android:textSize="18sp" />
-
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:background="@drawable/rp_arrow" />
-
-
-    </LinearLayout>
+   <ListView
+       android:id="@+id/search_group_lv_result"
+       android:layout_marginTop="20dp"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"></ListView>
 </LinearLayout>

@@ -3,6 +3,7 @@ package com.caishi.zhanghai.im.ui.activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,8 +25,11 @@ import android.widget.Toast;
 
 import com.caishi.zhanghai.im.bean.BaseReturnBean;
 import com.caishi.zhanghai.im.bean.BeanBean;
+import com.caishi.zhanghai.im.bean.ChangeGUserNameBean;
+import com.caishi.zhanghai.im.bean.ChangeGroupNameBean;
 import com.caishi.zhanghai.im.bean.GroupInfoReturnBean;
 import com.caishi.zhanghai.im.bean.GroupListReturnBean;
+import com.caishi.zhanghai.im.bean.GroupMembersReturnBean;
 import com.caishi.zhanghai.im.bean.QuitGroupBean;
 import com.caishi.zhanghai.im.net.CallBackJson;
 import com.caishi.zhanghai.im.net.SocketClient;
@@ -88,7 +92,8 @@ import io.rong.imlib.model.UserInfo;
  * Created by AMing on 16/1/27.
  * Company RongCloud
  */
-public class GroupDetailActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class
+GroupDetailActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     private static final int CLICK_CONVERSATION_USER_PORTRAIT = 1;
 
@@ -114,13 +119,13 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
     private Conversation.ConversationType mConversationType;
     private boolean isFromConversation;
     private LinearLayout mGroupAnnouncementDividerLinearLayout;
-    private TextView mGroupName;
+    private TextView mGroupName,mTvName;
     private PhotoUtils photoUtils;
     private BottomMenuDialog dialog;
     private UploadManager uploadManager;
     private String imageUrl;
     private Uri selectUri;
-    private String newGroupName;
+    private String newGroupName,cacheAccount,newNickName;
     private LinearLayout mGroupNotice;
     private LinearLayout mSearchMessagesLinearLayout;
     private Button mDismissBtn;
@@ -135,6 +140,8 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
         initViews();
         setTitle(R.string.group_info);
 
+        SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
+         cacheAccount = sp.getString("loginAccount", "");
         //群组会话界面点进群组详情
         fromConversationId = getIntent().getStringExtra("TargetId");
         mConversationType = (Conversation.ConversationType) getIntent().getSerializableExtra("conversationType");
@@ -145,8 +152,8 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
 
         if (isFromConversation) {//群组会话页进入
             LoadDialog.show(mContext);
-            getGroups();
-            getGroupMembers();
+//            getGroups();
+//            getGroupMembers();
         }
         setPortraitChangeListener();
 
@@ -154,7 +161,7 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
 
         setGroupsInfoChangeListener();
         getGroupInfo();
-        getGroupMember();
+
     }
 
     private void getGroupInfo() {
@@ -183,7 +190,7 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
         });
     }
 
-    private void  getGroupMember(){
+    private void getGroupMember() {
         QuitGroupBean groupBean = new QuitGroupBean();
         groupBean.setK("members");
         groupBean.setM("group");
@@ -197,6 +204,64 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
             @Override
             public void returnJson(String json) {
                 Log.e("json", json);
+                GroupMembersReturnBean groupMembersReturnBean = new Gson().fromJson(json, GroupMembersReturnBean.class);
+                if (null != groupMembersReturnBean) {
+                    Message message = new Message();
+                    message.obj = groupMembersReturnBean;
+                    message.what = 2;
+                    handler.sendMessage(message);
+                }
+            }
+        });
+    }
+    private void changeGroupName() {
+        ChangeGroupNameBean groupBean = new ChangeGroupNameBean();
+        groupBean.setK("setname");
+        groupBean.setM("group");
+        groupBean.setRid(String.valueOf(System.currentTimeMillis()));
+        ChangeGroupNameBean.VBean vBean = new ChangeGroupNameBean.VBean();
+        vBean.setGroupId(fromConversationId);
+        vBean.setGroupName(newGroupName);
+        groupBean.setV(vBean);
+        String msg = new Gson().toJson(groupBean);
+
+        SocketClient.getInstance().sendMsg(msg, new CallBackJson() {
+            @Override
+            public void returnJson(String json) {
+                Log.e("json", json);
+                BaseReturnBean baseReturnBean = new Gson().fromJson(json, BaseReturnBean.class);
+                if (null != baseReturnBean) {
+                    Message message = new Message();
+                    message.obj = baseReturnBean;
+                    message.what = 4;
+                    handler.sendMessage(message);
+                }
+            }
+        });
+    }
+
+    private void changeUserName() {
+        ChangeGUserNameBean gUserNameBean = new ChangeGUserNameBean();
+        gUserNameBean.setK("setnick");
+        gUserNameBean.setM("group");
+        gUserNameBean.setRid(String.valueOf(System.currentTimeMillis()));
+        ChangeGUserNameBean.VBean vBean = new ChangeGUserNameBean.VBean();
+        vBean.setGroupId(fromConversationId);
+        vBean.setNickName(newNickName);
+        gUserNameBean.setV(vBean);
+        String msg = new Gson().toJson(gUserNameBean);
+
+        SocketClient.getInstance().sendMsg(msg, new CallBackJson() {
+            @Override
+            public void returnJson(String json) {
+                Log.e("json", json);
+                BaseReturnBean baseReturnBean = new Gson().fromJson(json, BaseReturnBean.class);
+                if (null != baseReturnBean) {
+                    Message message = new Message();
+                    message.obj = baseReturnBean;
+                    message.what = 5;
+                    handler.sendMessage(message);
+                }
             }
         });
     }
@@ -248,7 +313,7 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
     private void initGroupData() {
         String portraitUri = SealUserInfoManager.getInstance().getPortraitUri(mGroup);
         ImageLoader.getInstance().displayImage(portraitUri, mGroupHeader, App.getOptions());
-        mGroupName.setText(mGroup.getName());
+        mGroupName.setText(mGroup.getDisplayName());
 
         if (RongIM.getInstance() != null) {
             RongIM.getInstance().getConversation(Conversation.ConversationType.GROUP, mGroup.getGroupsId(), new RongIMClient.ResultCallback<Conversation>() {
@@ -289,7 +354,7 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
             });
         }
 
-        if (mGroup.getRole().equals("0"))
+        if (mGroup.getRole().equals(cacheAccount))
             isCreated = true;
         if (!isCreated) {
             mGroupAnnouncementDividerLinearLayout.setVisibility(View.VISIBLE);
@@ -325,9 +390,12 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
         }
     }
 
-    private void quitGroup() {
+    /**
+     * 删除并退出群、解散并退出群
+     */
+    private void quitOrDissGroup(final String type) {
         QuitGroupBean quitGroupBean = new QuitGroupBean();
-        quitGroupBean.setK("quit");
+        quitGroupBean.setK(type);
         quitGroupBean.setM("group");
         quitGroupBean.setRid(String.valueOf(System.currentTimeMillis()));
         QuitGroupBean.VBean vBean = new QuitGroupBean.VBean();
@@ -342,7 +410,12 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
                 if (null != baseReturnBean) {
                     Message message = new Message();
                     message.obj = baseReturnBean;
-                    message.what = 0;
+                    if(type.equals("quit")){
+                        message.what = 0;
+                    }else if(type.equals("dismiss")){
+                        message.what = 3;
+                    }
+
                     handler.sendMessage(message);
                 }
 
@@ -351,6 +424,11 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
         });
 
     }
+
+
+
+
+
 
     private Handler handler = new Handler() {
         @Override
@@ -391,20 +469,105 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
                     }
                     break;
                 case 1://获取群组消息
-                    GroupInfoReturnBean groupInfoReturnBean = (GroupInfoReturnBean)msg.obj;
-                    NToast.shortToast(getApplication(),groupInfoReturnBean.getDesc());
-                    if(groupInfoReturnBean.getV().equals("ok")){
-//                        GroupInfoReturnBean.DataBean dataBean = groupInfoReturnBean.getData();
-//                        if(!TextUtils.isEmpty(dataBean.getPortraitUri())){
-//                            mGroup.setPortraitUri(dataBean.getPortraitUri());
-//                        }
-//
-//                        mGroup.setName(dataBean.getName());
-//                        mGroup.setGroupsId(dataBean.getId());
-//
-//                        initGroupData();
+                    GroupInfoReturnBean groupInfoReturnBean = (GroupInfoReturnBean) msg.obj;
+                    NToast.shortToast(getApplication(), groupInfoReturnBean.getDesc());
+                    if (groupInfoReturnBean.getV().equals("ok")) {
+                        GroupInfoReturnBean.DataBean dataBean = groupInfoReturnBean.getData();
+                        mGroup = new Groups();
+                        if (!TextUtils.isEmpty(dataBean.getPortraitUri())) {
+                            mGroup.setPortraitUri(dataBean.getPortraitUri());
+                        }
+                        mGroup.setDisplayName(dataBean.getName());
+                        mGroup.setGroupsId(dataBean.getId());
+                        mGroup.setRole(dataBean.getCreatorId());
+
+                        initGroupData();
+                    }
+                    getGroupMember();
+                    break;
+
+                case 2://获取群成员消息
+                    GroupMembersReturnBean groupMembersReturnBean = (GroupMembersReturnBean) msg.obj;
+                    NToast.longToast(getApplication(),groupMembersReturnBean.getDesc());
+                    if(groupMembersReturnBean.getV().equals("ok")){
+                        LoadDialog.dismiss(mContext);
+                        List<GroupMembersReturnBean.DataBean> dataBeanList = groupMembersReturnBean.getData();
+                        if (dataBeanList != null && dataBeanList.size() > 0) {
+                            mGroupMember = new ArrayList<>();
+                            GroupMember groupMember = null;
+                            for (GroupMembersReturnBean.DataBean dataBean:dataBeanList){
+                                groupMember = new GroupMember(dataBean.getUser().getId(),dataBean.getUser().getNickname(),Uri.parse((String) dataBean.getUser().getPortraitUri()));
+
+                                mGroupMember.add(groupMember);
+                                if(groupMember.getUserId().equals(cacheAccount)){
+                                    String nickName = groupMember.getName();
+                                    mTvName.setText(nickName);
+                                }
+                            }
+
+                            initGroupMemberData();
+                        }
                     }
 
+                    break;
+
+                case 3://解散群
+                    BaseReturnBean baseReturnBean1 = (BaseReturnBean) msg.obj;
+                    NToast.longToast(getApplication(), baseReturnBean1.getDesc());
+                    if (baseReturnBean1.getV().equals("ok")) {
+                        RongIM.getInstance().getConversation(Conversation.ConversationType.GROUP, fromConversationId, new RongIMClient.ResultCallback<Conversation>() {
+                            @Override
+                            public void onSuccess(Conversation conversation) {
+                                RongIM.getInstance().clearMessages(Conversation.ConversationType.GROUP, fromConversationId, new RongIMClient.ResultCallback<Boolean>() {
+                                    @Override
+                                    public void onSuccess(Boolean aBoolean) {
+                                        RongIM.getInstance().removeConversation(Conversation.ConversationType.GROUP, fromConversationId, null);
+                                    }
+
+                                    @Override
+                                    public void onError(RongIMClient.ErrorCode e) {
+
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onError(RongIMClient.ErrorCode e) {
+
+                            }
+                        });
+                        SealUserInfoManager.getInstance().deleteGroups(new Groups(fromConversationId));
+                        SealUserInfoManager.getInstance().deleteGroupMembers(fromConversationId);
+                        BroadcastManager.getInstance(mContext).sendBroadcast(SealConst.GROUP_LIST_UPDATE);
+                        setResult(501, new Intent());
+                        NToast.shortToast(mContext, getString(R.string.dismiss_success));
+                        LoadDialog.dismiss(mContext);
+                        finish();
+                    }
+                    break;
+
+                case 4://修改群名称
+                    BaseReturnBean baseReturnBean4 = (BaseReturnBean) msg.obj;
+                    NToast.longToast(getApplication(), baseReturnBean4.getDesc());
+                    if (baseReturnBean4.getV().equals("ok")) {
+                        SealUserInfoManager.getInstance().addGroup(
+                                new Groups(mGroup.getGroupsId(), newGroupName, mGroup.getPortraitUri(), mGroup.getRole())
+                        );
+                        mGroupName.setText(newGroupName);
+                        RongIM.getInstance().refreshGroupInfoCache(new Group(fromConversationId, newGroupName, TextUtils.isEmpty(mGroup.getPortraitUri()) ? Uri.parse(RongGenerate.generateDefaultAvatar(newGroupName, mGroup.getGroupsId())) : Uri.parse(mGroup.getPortraitUri())));
+                        LoadDialog.dismiss(mContext);
+                        NToast.shortToast(mContext, getString(R.string.update_success));
+                    }
+                    break;
+
+                case 5://修改群昵稱
+                    BaseReturnBean baseReturnBean5 = (BaseReturnBean) msg.obj;
+                    NToast.longToast(getApplication(), baseReturnBean5.getDesc());
+                    if (baseReturnBean5.getV().equals("ok")) {
+                        mTvName.setText(newNickName);
+                        LoadDialog.dismiss(mContext);
+                        NToast.shortToast(mContext, getString(R.string.update_success));
+                    }
                     break;
             }
         }
@@ -598,7 +761,7 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
                     public void executeEvent() {
                         LoadDialog.show(mContext);
 //                        request(QUIT_GROUP);
-                        quitGroup();
+                        quitOrDissGroup("quit");
                     }
 
                     @Override
@@ -617,7 +780,8 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
                     @Override
                     public void executeEvent() {
                         LoadDialog.show(mContext);
-                        request(DISMISS_GROUP);
+//                        request(DISMISS_GROUP);
+                        quitOrDissGroup("dismiss");
                     }
 
                     @Override
@@ -725,7 +889,8 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
                             }
                             newGroupName = editText;
                             LoadDialog.show(mContext);
-                            request(UPDATE_GROUP_NAME);
+//                            request(UPDATE_GROUP_NAME);
+                            changeGroupName();
                         }
 
                         @Override
@@ -733,6 +898,8 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
 
                         }
                     });
+                }else {
+                    NToast.longToast(getApplication(),"只有群主才能修改群名称");
                 }
                 break;
             case R.id.group_announcement:
@@ -740,6 +907,40 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
                 tempIntent.putExtra("conversationType", Conversation.ConversationType.GROUP.getValue());
                 tempIntent.putExtra("targetId", fromConversationId);
                 startActivity(tempIntent);
+                break;
+
+            case R.id.ll_user_name://修改群名片
+                DialogWithYesOrNoUtils.getInstance().showEditDialog(mContext, getString(R.string.new_group_nike), getString(R.string.confirm), new DialogWithYesOrNoUtils.DialogCallBack() {
+                    @Override
+                    public void executeEvent() {
+
+                    }
+
+                    @Override
+                    public void executeEditEvent(String editText) {
+                        if (TextUtils.isEmpty(editText)) {
+                            return;
+                        }
+                        if (editText.length() < 2 && editText.length() > 10) {
+                            NToast.shortToast(mContext, "群昵称应为 2-10 字");
+                            return;
+                        }
+
+                        if (AndroidEmoji.isEmoji(editText) && editText.length() < 4) {
+                            NToast.shortToast(mContext, "群名称表情过短");
+                            return;
+                        }
+                        newNickName = editText;
+                        LoadDialog.show(mContext);
+//                            request(UPDATE_GROUP_NAME);
+                        changeUserName();
+                    }
+
+                    @Override
+                    public void updatePassword(String oldPassword, String newPassword) {
+
+                    }
+                });
                 break;
         }
     }
@@ -1088,12 +1289,14 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
         LinearLayout mGroupDisplayName = (LinearLayout) findViewById(R.id.group_displayname);
         mGroupDisplayNameText = (TextView) findViewById(R.id.group_displayname_text);
         mGroupName = (TextView) findViewById(R.id.group_name);
+        mTvName = (TextView) findViewById(R.id.user_tv_name);
         mQuitBtn = (Button) findViewById(R.id.group_quit);
         mDismissBtn = (Button) findViewById(R.id.group_dismiss);
         RelativeLayout totalGroupMember = (RelativeLayout) findViewById(R.id.group_member_size_item);
         RelativeLayout memberOnlineStatus = (RelativeLayout) findViewById(R.id.group_member_online_status);
         LinearLayout mGroupPortL = (LinearLayout) findViewById(R.id.ll_group_port);
         LinearLayout mGroupNameL = (LinearLayout) findViewById(R.id.ll_group_name);
+        LinearLayout ll_user_name = (LinearLayout) findViewById(R.id.ll_user_name);
         mGroupAnnouncementDividerLinearLayout = (LinearLayout) findViewById(R.id.ac_ll_group_announcement_divider);
         mGroupNotice = (LinearLayout) findViewById(R.id.group_announcement);
         mSearchMessagesLinearLayout = (LinearLayout) findViewById(R.id.ac_ll_search_chatting_records);
@@ -1106,6 +1309,7 @@ public class GroupDetailActivity extends BaseActivity implements View.OnClickLis
             memberOnlineStatus.setVisibility(View.VISIBLE);
         }
         mQuitBtn.setOnClickListener(this);
+        ll_user_name.setOnClickListener(this);
         mDismissBtn.setOnClickListener(this);
         groupClean.setOnClickListener(this);
         mGroupNotice.setOnClickListener(this);

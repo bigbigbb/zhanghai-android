@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="70dp">
+
+    <com.caishi.zhanghai.im.server.widget.SelectableRoundedImageView
+        android:id="@+id/search_item_header"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:layout_marginLeft="6dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/loading"
+        app:sriv_left_bottom_corner_radius="3dip"
+        app:sriv_left_top_corner_radius="3dip"
+        app:sriv_right_bottom_corner_radius="3dip"
+        app:sriv_right_top_corner_radius="3dip" />
+
+    <TextView
+        android:text="吃喝玩乐群"
+        android:layout_toRightOf="@id/search_item_header"
+        android:id="@+id/search_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="10dp"
+        android:maxLines="1"
+        android:textColor="@color/group_list_gray"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_below="@id/search_item_name"
+        android:text="群主"
+        android:layout_toRightOf="@id/search_item_header"
+        android:id="@+id/search_item_owner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/group_list_gray"
+        android:textSize="18sp" />
+    <TextView
+        android:layout_marginLeft="10dp"
+        android:layout_below="@id/search_item_name"
+        android:text="群成员：11"
+        android:layout_toRightOf="@id/search_item_owner"
+        android:id="@+id/search_item_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/group_list_gray"
+        android:textSize="18sp" />
+
+    <Button
+        android:padding="8dp"
+        android:layout_alignParentRight="true"
+        android:id="@+id/btn_search_group"
+        android:textSize="18sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dip"
+        android:layout_marginRight="30dip"
+        android:layout_marginTop="14dip"
+        android:background="@drawable/rs_select_btn_blue"
+        android:text="+加入"
+        android:textColor="#FFFFFF" />
+
+</RelativeLayout>

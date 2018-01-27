@@ -149,6 +149,7 @@ public class GroupListActivity extends BaseActivity {
                 List<GroupListReturnBean.DataBean> listReturnBeans = groupListReturnBean.getData();
                 if(listReturnBeans.size()>0){
                     Groups groups = null;
+                    mList = new ArrayList<>();
                     for (GroupListReturnBean.DataBean dataBean:listReturnBeans){
                         groups = new Groups();
                         groups.setGroupsId(dataBean.getId());

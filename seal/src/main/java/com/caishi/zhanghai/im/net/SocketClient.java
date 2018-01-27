@@ -221,7 +221,7 @@ public class SocketClient {
                             String message = new String(Arrays.copyOf(buffer,
                                     length)).trim();
                             Log.e(TAG, "message"+message);
-                            if (!TextUtils.isEmpty(message) && message.equals("{\"rid\":\"0\",\"m\":\"system\",\"k\":\"ping\",\"v\":\"\"}")) {
+                            if (!TextUtils.isEmpty(message) && message.contains("{\"rid\":\"0\",\"m\":\"system\",\"k\":\"ping\",\"v\":\"\"}")) {
                                 Log.e("test", "收到心跳检测");
                                 sendMsg(initHeartData());
 
