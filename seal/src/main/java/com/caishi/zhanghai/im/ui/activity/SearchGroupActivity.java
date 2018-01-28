@@ -105,8 +105,8 @@ public class SearchGroupActivity extends BaseActivity {
         mTvSearchNumber.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mTvSearchName.setTextColor(getResources().getColor(R.color.color_03a9f4));
-                mTvSearchNumber.setTextColor(getResources().getColor(R.color.color_434343));
+                mTvSearchNumber.setTextColor(getResources().getColor(R.color.color_03a9f4));
+                mTvSearchName.setTextColor(getResources().getColor(R.color.color_434343));
                 searchType = 0;
 
             }
@@ -187,14 +187,18 @@ public class SearchGroupActivity extends BaseActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
-                case 0://查找好友
+                case 0://查找群
                     SearchGroupReturnBean searchGroupReturnBean = (SearchGroupReturnBean) msg.obj;
                     LoadDialog.dismiss(mContext);
-                    NToast.shortToast(mContext, searchGroupReturnBean.getDesc());
+
                     if (null != searchGroupReturnBean.getData()) {
+                        mLvResult.setVisibility(View.VISIBLE);
                         MyAdapter myAdapter = new MyAdapter(searchGroupReturnBean.getData());
                         mLvResult.setAdapter(myAdapter);
-
+                        NToast.shortToast(mContext, searchGroupReturnBean.getDesc());
+                    }else {
+                        NToast.shortToast(mContext, "没有对应的群");
+                        mLvResult.setVisibility(View.GONE);
                     }
 
                     break;

@@ -62,12 +62,13 @@ public class GroupListActivity extends BaseActivity {
         mNoGroups = (TextView) findViewById(R.id.show_no_group);
         mSearch = (EditText) findViewById(R.id.group_search);
         mTextView = (TextView)findViewById(R.id.foot_group_size);
-        initData();
+//        initData();
         getAllGroup();
         BroadcastManager.getInstance(mContext).addAction(SealConst.GROUP_LIST_UPDATE, new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                initData();
+//                initData();
+                getAllGroup();
             }
         });
     }

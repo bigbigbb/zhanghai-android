@@ -20,10 +20,10 @@
             android:layout_width="0dp"
             android:layout_height="match_parent" />
         <TextView
-            android:textColor="@color/color_434343"
+            android:background="@color/group_list_gray"
+            android:textColor="@color/group_list_gray"
             android:layout_margin="5dp"
-            android:layout_weight="0.1"
-            android:layout_width="0dp"
+            android:layout_width="1dp"
             android:layout_height="match_parent" />
         <TextView
             android:textColor="@color/color_434343"
@@ -38,7 +38,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:background="@color/color_434343"></View>
+        android:background="@color/group_list_gray"></View>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -73,6 +73,8 @@
         android:textColor="#FFFFFF" />
 
    <ListView
+       android:divider="@color/group_list_gray"
+       android:dividerHeight=".05dp"
        android:id="@+id/search_group_lv_result"
        android:layout_marginTop="20dp"
        android:layout_width="match_parent"
