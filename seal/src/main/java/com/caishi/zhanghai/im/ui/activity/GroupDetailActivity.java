@@ -357,6 +357,9 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         if (mGroup.getRole().equals(cacheAccount)) {
             isCreated = true;
             detail_group_lly_setting.setVisibility(View.VISIBLE);
+
+
+
         }
         if (!isCreated) {
             mGroupAnnouncementDividerLinearLayout.setVisibility(View.VISIBLE);
