@@ -1,178 +1,282 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ebebeb"
     android:orientation="vertical">
 
-
-    <TextView
-        android:padding="10dp"
-        android:text="您已选择了1位联系人创建群组"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/create_group_tv_show"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="您已选择了1位联系人创建群组" />
 
-    <com.caishi.zhanghai.im.server.widget.ClearWriteEditText
-        android:paddingLeft="10dp"
-        android:id="@+id/create_groupname"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@android:color/white"
-        android:layout_marginTop="80dp"
-        android:hint="@string/edit_group_name"
-        android:maxLength="10" />
-    <LinearLayout
-        android:padding="5dp"
-        android:layout_marginTop="1dp"
-        android:id="@+id/ll_group_port"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/btn_list_item_bg"
-        android:orientation="horizontal">
+            <com.caishi.zhanghai.im.ui.widget.DemoGridView
+                android:verticalSpacing="5dp"
+                android:layout_margin="10dp"
+                android:id="@+id/ac_gd_crate_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:numColumns="5"></com.caishi.zhanghai.im.ui.widget.DemoGridView>
 
-        <TextView
-            android:paddingLeft="10dp"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:gravity="center_vertical"
-            android:layout_weight="1"
-            android:text="@string/group_portrait"
-            android:textColor="@color/text_color"
-            android:textSize="16sp" />
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/create_group_tv_look"
+                android:layout_margin="10dp"
+                android:text="查看全部成员"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <com.caishi.zhanghai.im.server.widget.ClearWriteEditText
+                android:id="@+id/create_groupname"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:background="@android:color/white"
+                android:hint="@string/edit_group_name"
+                android:maxLength="10"
+                android:paddingLeft="10dp" />
 
-        <io.rong.imkit.widget.AsyncImageView
-            android:id="@+id/img_Group_portrait"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/add_group_head" />
+            <LinearLayout
+                android:id="@+id/ll_group_port"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:background="@drawable/btn_list_item_bg"
+                android:orientation="horizontal"
+                android:padding="5dp">
 
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:text="@string/group_portrait"
+                    android:textColor="@color/text_color"
+                    android:textSize="16sp" />
 
-    </LinearLayout>
-
-
-
-    <LinearLayout
-
-        android:padding="5dp"
-        android:layout_marginTop="20dp"
-        android:id="@+id/ll_group_one"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/btn_list_item_bg"
-        android:orientation="horizontal">
-
-        <TextView
-            android:paddingLeft="10dp"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:gravity="center_vertical"
-            android:layout_weight="1"
-            android:text="申请入群无须审核"
-            android:textColor="@color/text_color"
-            android:textSize="16sp" />
-
-        <io.rong.imkit.widget.AsyncImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/add_group_head" />
+                <io.rong.imkit.widget.AsyncImageView
+                    android:id="@+id/img_Group_portrait"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/add_group_head" />
 
 
-    </LinearLayout>
-    <LinearLayout
-
-        android:padding="5dp"
-        android:layout_marginTop="1dp"
-        android:id="@+id/ll_group_two"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/btn_list_item_bg"
-        android:orientation="horizontal">
-
-        <TextView
-            android:paddingLeft="10dp"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:gravity="center_vertical"
-            android:layout_weight="1"
-            android:text="付费入群"
-            android:textColor="@color/text_color"
-            android:textSize="16sp" />
-
-        <io.rong.imkit.widget.AsyncImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/add_group_head" />
+            </LinearLayout>
 
 
-    </LinearLayout>
-    <LinearLayout
+            <LinearLayout
 
-        android:padding="5dp"
-        android:layout_marginTop="1dp"
-        android:id="@+id/ll_group_three"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/btn_list_item_bg"
-        android:orientation="horizontal">
+                android:id="@+id/ll_group_one"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/btn_list_item_bg"
+                android:orientation="horizontal"
+                android:padding="5dp">
 
-        <TextView
-            android:paddingLeft="10dp"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:gravity="center_vertical"
-            android:layout_weight="1"
-            android:text="群成员可以互相查看资料"
-            android:textColor="@color/text_color"
-            android:textSize="16sp" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:text="申请入群无须审核"
+                    android:textColor="@color/text_color"
+                    android:textSize="16sp" />
 
-        <io.rong.imkit.widget.AsyncImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/add_group_head" />
-
-
-    </LinearLayout>
-    <LinearLayout
-
-        android:padding="5dp"
-        android:layout_marginTop="1dp"
-        android:id="@+id/ll_group_four"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/btn_list_item_bg"
-        android:orientation="horizontal">
-
-        <TextView
-            android:paddingLeft="10dp"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:gravity="center_vertical"
-            android:layout_weight="1"
-            android:text="群成员可以互相添加资料"
-            android:textColor="@color/text_color"
-            android:textSize="16sp" />
-
-        <io.rong.imkit.widget.AsyncImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/add_group_head" />
+                <com.caishi.zhanghai.im.ui.widget.switchbutton.SwitchButton
+                    android:id="@+id/sw_group_one"
+                    style="@style/SwitchButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:padding="8dp"
+                    app:kswAnimationDuration="300"
+                    app:kswBackDrawable="@drawable/ios_back_drawable"
+                    app:kswBackMeasureRatio="1.4"
+                    app:kswThumbDrawable="@drawable/ios_thumb"
+                    app:kswThumbMarginBottom="-8dp"
+                    app:kswThumbMarginLeft="-5dp"
+                    app:kswThumbMarginRight="-5dp"
+                    app:kswThumbMarginTop="-2.5dp" />
 
 
-    </LinearLayout>
-    <Button
-        android:layout_marginTop="20dp"
-        android:id="@+id/create_ok"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:background="@drawable/rs_select_btn_blue"
-        android:text="确认创建"
-        android:textColor="#FFF" />
+            </LinearLayout>
+
+            <LinearLayout
+
+                android:id="@+id/ll_group_two"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:background="@drawable/btn_list_item_bg"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:text="付费入群"
+                    android:textColor="@color/text_color"
+                    android:textSize="16sp" />
+
+                <com.caishi.zhanghai.im.ui.widget.switchbutton.SwitchButton
+                    android:id="@+id/sw_group_two"
+                    style="@style/SwitchButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:padding="8dp"
+                    app:kswAnimationDuration="300"
+                    app:kswBackDrawable="@drawable/ios_back_drawable"
+                    app:kswBackMeasureRatio="1.4"
+                    app:kswThumbDrawable="@drawable/ios_thumb"
+                    app:kswThumbMarginBottom="-8dp"
+                    app:kswThumbMarginLeft="-5dp"
+                    app:kswThumbMarginRight="-5dp"
+                    app:kswThumbMarginTop="-2.5dp" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_group_two_two"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:background="@drawable/btn_list_item_bg"
+                android:orientation="horizontal"
+                android:padding="5dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:text="请输入进群需要支付的费用(元)"
+                    android:textColor="@color/text_color"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/tv_group_two_two"
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:text="10" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+
+                android:id="@+id/ll_group_three"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:background="@drawable/btn_list_item_bg"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:text="群成员可以互相查看资料"
+                    android:textColor="@color/text_color"
+                    android:textSize="16sp" />
+
+                <com.caishi.zhanghai.im.ui.widget.switchbutton.SwitchButton
+                    android:id="@+id/sw_group_three"
+                    style="@style/SwitchButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:padding="8dp"
+                    app:kswAnimationDuration="300"
+                    app:kswBackDrawable="@drawable/ios_back_drawable"
+                    app:kswBackMeasureRatio="1.4"
+                    app:kswThumbDrawable="@drawable/ios_thumb"
+                    app:kswThumbMarginBottom="-8dp"
+                    app:kswThumbMarginLeft="-5dp"
+                    app:kswThumbMarginRight="-5dp"
+                    app:kswThumbMarginTop="-2.5dp" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+
+                android:id="@+id/ll_group_four"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:background="@drawable/btn_list_item_bg"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:text="群成员可以互相添加资料"
+                    android:textColor="@color/text_color"
+                    android:textSize="16sp" />
+
+                <com.caishi.zhanghai.im.ui.widget.switchbutton.SwitchButton
+                    android:id="@+id/sw_group_four"
+                    style="@style/SwitchButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:padding="8dp"
+                    app:kswAnimationDuration="300"
+                    app:kswBackDrawable="@drawable/ios_back_drawable"
+                    app:kswBackMeasureRatio="1.4"
+                    app:kswThumbDrawable="@drawable/ios_thumb"
+                    app:kswThumbMarginBottom="-8dp"
+                    app:kswThumbMarginLeft="-5dp"
+                    app:kswThumbMarginRight="-5dp"
+                    app:kswThumbMarginTop="-2.5dp" />
+
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/create_ok"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/rs_select_btn_blue"
+                android:text="确认创建"
+                android:textColor="#FFF" />
+        </LinearLayout>
+    </ScrollView>
+
+
+
 
 </LinearLayout>

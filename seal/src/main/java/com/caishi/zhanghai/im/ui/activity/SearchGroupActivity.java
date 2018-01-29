@@ -63,7 +63,7 @@ public class SearchGroupActivity extends BaseActivity {
     private static final int ADD_FRIEND = 11;
     private EditText mEtSearch;
     private LinearLayout searchItem;
-    private TextView searchName,mTvSearchName,mTvSearchNumber;
+    private TextView searchName, mTvSearchName, mTvSearchNumber;
     private SelectableRoundedImageView searchImage;
     private String mPhone;
     private String addFriendMessage;
@@ -71,7 +71,7 @@ public class SearchGroupActivity extends BaseActivity {
     private Button mBtnSearch;
 
     private Friend mFriend;
-    private int searchType=0;//默认按群号码搜索
+    private int searchType = 0;//默认按群号码搜索
     private ListView mLvResult;
 
     @Override
@@ -85,7 +85,7 @@ public class SearchGroupActivity extends BaseActivity {
         searchName = (TextView) findViewById(R.id.search_name);
         mTvSearchNumber = (TextView) findViewById(R.id.ac_search_tv_number);
         mTvSearchName = (TextView) findViewById(R.id.ac_search_tv_name);
-        mBtnSearch= (Button) findViewById(R.id.btn_search_group);
+        mBtnSearch = (Button) findViewById(R.id.btn_search_group);
         searchImage = (SelectableRoundedImageView) findViewById(R.id.search_header);
         mLvResult = (ListView) findViewById(R.id.search_group_lv_result);
         initListener();
@@ -93,7 +93,7 @@ public class SearchGroupActivity extends BaseActivity {
     }
 
 
-    private void initListener(){
+    private void initListener() {
         mBtnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,6 +121,7 @@ public class SearchGroupActivity extends BaseActivity {
         });
 
     }
+
     private void searchGroup() {
         SearchGroupBean searchFriendBean = new SearchGroupBean();
         searchFriendBean.setK("search");
@@ -130,9 +131,9 @@ public class SearchGroupActivity extends BaseActivity {
         mPhone = mEtSearch.getText().toString();
         vBean.setSearchkey(mPhone);
         //type :  "code" 按群编号搜索（精确），"name" 按群名称搜索（模糊）
-        if(searchType==0){
+        if (searchType == 0) {
             vBean.setType("code");
-        }else  if(searchType==1){
+        } else if (searchType == 1) {
             vBean.setType("name");
         }
         searchFriendBean.setV(vBean);
@@ -196,7 +197,7 @@ public class SearchGroupActivity extends BaseActivity {
                         MyAdapter myAdapter = new MyAdapter(searchGroupReturnBean.getData());
                         mLvResult.setAdapter(myAdapter);
                         NToast.shortToast(mContext, searchGroupReturnBean.getDesc());
-                    }else {
+                    } else {
                         NToast.shortToast(mContext, "没有对应的群");
                         mLvResult.setVisibility(View.GONE);
                     }
@@ -208,7 +209,7 @@ public class SearchGroupActivity extends BaseActivity {
                     AddFriendReturnBean.DataBean dataBean = addFriendReturnBean.getData();
                     NToast.shortToast(mContext, addFriendReturnBean.getDesc());
                     LoadDialog.dismiss(mContext);
-                    if(null!=dataBean){
+                    if (null != dataBean) {
 
 
                     }
@@ -249,7 +250,6 @@ public class SearchGroupActivity extends BaseActivity {
         });
 
     }
-
 
 
     @Override
@@ -397,8 +397,8 @@ public class SearchGroupActivity extends BaseActivity {
         return false;
     }
 
-    private class  MyAdapter extends BaseAdapter{
-        private List<SearchGroupReturnBean.DataBean>  dataBeanList;
+    private class MyAdapter extends BaseAdapter {
+        private List<SearchGroupReturnBean.DataBean> dataBeanList;
 
         public MyAdapter(List<SearchGroupReturnBean.DataBean> dataBeanList) {
             this.dataBeanList = dataBeanList;
@@ -411,18 +411,49 @@ public class SearchGroupActivity extends BaseActivity {
 
         @Override
         public View getView(final int i, View view, ViewGroup viewGroup) {
-            view  =  getLayoutInflater().inflate(R.layout.activity_search_group_detail,viewGroup,false);
-            SelectableRoundedImageView selectableRoundedImageView  = (SelectableRoundedImageView)view.findViewById(R.id.search_item_header);
+            view = getLayoutInflater().inflate(R.layout.activity_search_group_detail, viewGroup, false);
+            SelectableRoundedImageView selectableRoundedImageView = (SelectableRoundedImageView) view.findViewById(R.id.search_item_header);
             TextView search_item_name = (TextView) view.findViewById(R.id.search_item_name);
             TextView search_item_owner = (TextView) view.findViewById(R.id.search_item_owner);
             TextView search_item_count = (TextView) view.findViewById(R.id.search_item_count);
+            TextView search_item_pay = (TextView) view.findViewById(R.id.search_item_pay);
+            TextView search_item_join = (TextView) view.findViewById(R.id.search_item_join);
             Button btn_search_group = (Button) view.findViewById(R.id.btn_search_group);
-            if(null!=dataBeanList&&dataBeanList.size()>0){
+            if (null != dataBeanList && dataBeanList.size() > 0) {
                 SearchGroupReturnBean.DataBean dataBean = dataBeanList.get(i);
                 ImageLoader.getInstance().displayImage(dataBean.getPortraitUri(), selectableRoundedImageView, App.getOptions());
                 search_item_name.setText(dataBean.getName());
-                search_item_owner.setText("群主："+dataBean.getCreatorName());
-                search_item_count.setText("群成员："+dataBean.getMemberCount());
+                search_item_owner.setText("群主：" + dataBean.getCreatorName());
+                search_item_count.setText("群成员：" + dataBean.getMemberCount());
+                if (dataBean.getJoin_direct() == 0) {
+                    search_item_join.setText("无需审核");
+                    search_item_join.setTextColor(getResources().getColor(R.color.group_list_gray));
+                } else if (dataBean.getJoin_direct() == 1) {
+                    search_item_join.setText("需要审核");
+                    search_item_join.setTextColor(getResources().getColor(R.color.orange));
+                }
+
+                if (dataBean.getJoin_amount().equals("0.00")) {
+                    search_item_pay.setText("免费");
+                    search_item_pay.setTextColor(getResources().getColor(R.color.group_list_gray));
+                } else {
+                    search_item_pay.setText("付费：" + dataBean.getJoin_amount() + "元");
+                    search_item_pay.setTextColor(getResources().getColor(R.color.orange));
+                }
+
+                if(dataBean.getJoin_direct() == 0&&dataBean.getJoin_amount().equals("0.00")){
+                    //免费   无须申请     加入
+                    btn_search_group.setText("+加入");
+                }else if(dataBean.getJoin_direct() == 0&&!dataBean.getJoin_amount().equals("0.00")){
+                    //付费  无须申请    付费加入
+                    btn_search_group.setText("+付费加入");
+                }else if(dataBean.getJoin_direct() == 1&&dataBean.getJoin_amount().equals("0.00")){
+                    //免费  申请    申请
+                    btn_search_group.setText("+申请");
+                }else if(dataBean.getJoin_direct() == 1&&!dataBean.getJoin_amount().equals("0.00")){
+                    //付费  申请    付费申请
+                    btn_search_group.setText("+付费申请");
+                }
             }
             btn_search_group.setOnClickListener(new View.OnClickListener() {
                 @Override

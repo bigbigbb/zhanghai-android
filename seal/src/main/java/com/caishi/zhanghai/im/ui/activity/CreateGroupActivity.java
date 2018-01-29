@@ -11,8 +11,14 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.GridView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.caishi.zhanghai.im.bean.BaseReturnBean;
 import com.caishi.zhanghai.im.bean.CreateGroupBean;
@@ -24,6 +30,8 @@ import com.caishi.zhanghai.im.bean.UploadGroupPicBean;
 import com.caishi.zhanghai.im.net.CallBackJson;
 import com.caishi.zhanghai.im.net.ReqSSl;
 import com.caishi.zhanghai.im.net.SocketClient;
+import com.caishi.zhanghai.im.ui.widget.DemoGridView;
+import com.caishi.zhanghai.im.ui.widget.switchbutton.SwitchButton;
 import com.caishi.zhanghai.im.utils.CommonUtils;
 import com.google.gson.Gson;
 import com.qiniu.android.http.ResponseInfo;
@@ -64,13 +72,16 @@ import io.rong.imlib.model.Conversation;
  * Created by AMing on 16/1/25.
  * Company RongCloud
  */
-public class CreateGroupActivity extends BaseActivity implements View.OnClickListener {
+public class CreateGroupActivity extends BaseActivity implements View.OnClickListener,CompoundButton.OnCheckedChangeListener {
 
     private static final int GET_QI_NIU_TOKEN = 131;
     private static final int CREATE_GROUP = 16;
     private static final int SET_GROUP_PORTRAIT_URI = 17;
     public static final String REFRESH_GROUP_UI = "REFRESH_GROUP_UI";
     private AsyncImageView asyncImageView;
+    private LinearLayout ll_group_two_two;
+    private TextView create_group_tv_show,create_group_tv_look,tv_group_two_two;
+    private DemoGridView ac_gd_crate_group;
     private PhotoUtils photoUtils;
     private BottomMenuDialog dialog;
     private String mGroupName, mGroupId;
@@ -81,6 +92,7 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
     private String portraitUri;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
+    private MyAdpter myAdpter;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -93,12 +105,27 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
         List<Friend> memberList = (List<Friend>) getIntent().getSerializableExtra("GroupMember");
         initView();
         setPortraitChangeListener();
+        List<String> list = new ArrayList<>();
         if (memberList != null && memberList.size() > 0) {
             groupIds.add(getSharedPreferences("config", MODE_PRIVATE).getString(SealConst.SEALTALK_LOGIN_ID, ""));
             for (Friend f : memberList) {
                 groupIds.add(f.getUserId());
+                list.add(f.getName());
             }
         }
+
+//        for (int i =0 ;i<100;i++){
+//            list.add(""+i);
+//        }
+        create_group_tv_show.setText("您已选择了"+list.size()+"位联系人创建群组");
+
+        if(list.size()>10){
+            create_group_tv_look.setVisibility(View.VISIBLE);
+        }else {
+            create_group_tv_look.setVisibility(View.GONE);
+        }
+        myAdpter = new MyAdpter(list);
+        ac_gd_crate_group.setAdapter(myAdpter);
     }
 
     private String baseString;
@@ -113,7 +140,6 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
                     baseString = CommonUtils.convertIconToString(CommonUtils.getBitmapFromUri(uri, getApplication()));
 //                    LoadDialog.show(mContext);
 //                    request(GET_QI_NIU_TOKEN);
-
                 }
             }
 
@@ -128,13 +154,76 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
         asyncImageView = (AsyncImageView) findViewById(R.id.img_Group_portrait);
         asyncImageView.setOnClickListener(this);
         Button mButton = (Button) findViewById(R.id.create_ok);
+        SwitchButton sw_group_one = (SwitchButton) findViewById(R.id.sw_group_one);
+        SwitchButton sw_group_two = (SwitchButton) findViewById(R.id.sw_group_two);
+        SwitchButton sw_group_three = (SwitchButton) findViewById(R.id.sw_group_three);
+        SwitchButton sw_group_four = (SwitchButton) findViewById(R.id.sw_group_four);
+        ll_group_two_two = (LinearLayout) findViewById(R.id.ll_group_two_two);
+        create_group_tv_look = (TextView) findViewById(R.id.create_group_tv_look);
+        tv_group_two_two = (TextView) findViewById(R.id.tv_group_two_two);
+        create_group_tv_show = (TextView) findViewById(R.id.create_group_tv_show);
+        ac_gd_crate_group = (DemoGridView) findViewById(R.id.ac_gd_crate_group);
         mButton.setOnClickListener(this);
+        create_group_tv_look.setOnClickListener(this);
+        sw_group_one.setOnCheckedChangeListener(this);
+        sw_group_two.setOnCheckedChangeListener(this);
+        sw_group_three.setOnCheckedChangeListener(this);
+        sw_group_four.setOnCheckedChangeListener(this);
         mGroupNameEdit = (ClearWriteEditText) findViewById(R.id.create_groupname);
+
     }
 
+
+
+    @Override
+    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        switch (compoundButton.getId()){
+            case R.id.sw_group_one:
+                if(b){
+                   is_join_direct = true;
+                }else {
+                    is_join_direct = false;
+                }
+                break;
+            case R.id.sw_group_two:
+                if(b){
+                    is_join_via_pay = true;
+                    ll_group_two_two.setVisibility(View.VISIBLE);
+                }else {
+                    is_join_via_pay =false;
+                    ll_group_two_two.setVisibility(View.GONE);
+                }
+                break;
+            case R.id.sw_group_three:
+                if(b){
+                    is_view_each = true;
+                }else {
+                    is_view_each = false;
+                }
+                break;
+            case R.id.sw_group_four:
+                if(b){
+                    is_invite_each= true;
+                }else {
+                    is_invite_each =false;
+                }
+                break;
+        }
+
+    }
+
+    private  boolean isLookAll = false;
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.create_group_tv_look://查看更多群成员
+                if(isLookAll){
+                   isLookAll = !isLookAll;
+                }else {
+                    isLookAll = !isLookAll;
+                }
+                myAdpter.notifyDataSetChanged();
+                break;
             case R.id.img_Group_portrait:
                 showPhotoDialog();
                 break;
@@ -165,14 +254,21 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
     }
 
 
+    private boolean is_join_direct =false;
+    private boolean is_join_via_pay =false;
+    private boolean is_view_each =false;
+    private boolean is_invite_each =false;
     /**
-     * "is_join_via_pay":"1", //是否开启付费入群功能,1或0
-     * "join_amount":"10.00", //入群费用10.00元,上面开关是0的话则这里填0.00
-     * "is_recheck_paid":"0", //用户付费后是否需要审核才能入群,0则付费直接入群
-     * "is_view_each":"0", //群成员是否可以点开其他成员头像查看资料
-     * "is_invite_each":"0", //群成员是否可以发送添加好友给其他成员
+     "groupName": "吃喝玩乐群",
+     "groupMemberList": ["e10adc3949ba59abbe56e057f20f883e","e10adc3949ba59abbe56e057f20f883e"],
+     "join_direct":"1", //是否直接入群而不需要审核
+     "is_join_via_pay":"1", //是否开启付费入群功能,1或0
+     "join_amount":"10.00", //入群费用10.00元,上面开关是0的话则这里填0.00
+     "is_view_each":"0", //群成员是否可以点开其他成员头像查看资料
+     "is_invite_each":"0", //群成员是否可以发送添加好友给其他成员
      */
     private void createGroup() {
+        String joinAmount = tv_group_two_two.getText().toString();
         final CreateGroupBean createGroupBean = new CreateGroupBean();
         createGroupBean.setK("create");
         createGroupBean.setM("group");
@@ -180,11 +276,32 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
         CreateGroupBean.VBean vBean = new CreateGroupBean.VBean();
         vBean.setGroupMemberList(groupIds);
         vBean.setGroupName(mGroupName);
-        vBean.setIs_join_via_pay("1");
-        vBean.setJoin_amount("10.00");
-        vBean.setIs_recheck_paid("0");
-        vBean.setIs_view_each("0");
-        vBean.setIs_invite_each("0");
+        if(is_join_direct){
+            vBean.setJoin_direct("1");
+        }else {
+            vBean.setJoin_direct("0");
+        }
+        if(is_join_via_pay){
+            vBean.setIs_join_via_pay("1");
+            vBean.setJoin_amount(joinAmount);
+        }else {
+            vBean.setIs_join_via_pay("0");
+            vBean.setJoin_amount("0");
+        }
+
+
+        if(is_view_each){
+            vBean.setIs_view_each("1");
+        }else {
+            vBean.setIs_view_each("0");
+        }
+
+        if(is_invite_each){
+            vBean.setIs_invite_each("1");
+        }else {
+            vBean.setIs_invite_each("0");
+        }
+
         createGroupBean.setV(vBean);
 
         String msg = new Gson().toJson(createGroupBean);
@@ -464,5 +581,49 @@ public class CreateGroupActivity extends BaseActivity implements View.OnClickLis
                 imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
             }
         }
+    }
+
+    private class MyAdpter extends BaseAdapter{
+        private List<String> stringList;
+
+        public MyAdpter(List<String> stringList) {
+            this.stringList = stringList;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return i;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            view = getLayoutInflater().inflate(R.layout.activity_create_group_item,viewGroup,false);
+            TextView textView = (TextView) view.findViewById(R.id.tv_create_group_item);
+            if(null!=stringList&&stringList.size()>0){
+                textView.setText(stringList.get(i));
+            }
+
+            return view;
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return stringList.get(i);
+        }
+
+        @Override
+        public int getCount() {
+            int  count = stringList.size();
+            if(count>10){
+                if(isLookAll){
+                    count = stringList.size();
+                }else {
+                    count =10;
+                }
+            }
+            return count;
+        }
+
+
     }
 }

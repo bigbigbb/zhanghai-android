@@ -150,6 +150,7 @@
     <string name="new_password">新密码</string>
     <string name="confirm_new_password">确认新密码</string>
     <string name="group_info">群组信息</string>
+    <string name="group_apply">入群申请</string>
     <string name="group_member_size">全部群成员</string>
     <string name="group_name">群名称</string>
     <string name="confirm_quit_group">确认退出群组?</string>

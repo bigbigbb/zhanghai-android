@@ -60,6 +60,25 @@
 
             </RelativeLayout>
             <RelativeLayout
+                android:layout_marginTop="20dp"
+                android:id="@+id/group_member_apply_lly"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/btn_list_item_bg"
+                android:clickable="true">
+
+                <TextView
+                    android:id="@+id/group_member_apply_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="14dp"
+                    android:text="入群申请列表"
+                    android:textColor="@color/text_color"
+                    android:textSize="16sp" />
+
+            </RelativeLayout>
+            <RelativeLayout
                 android:id="@+id/group_member_online_status"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"

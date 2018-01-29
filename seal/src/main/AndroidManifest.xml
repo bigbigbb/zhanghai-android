@@ -142,6 +142,9 @@
         <activity
             android:name=".ui.activity.SearchGroupActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.GroupApplyListAc"
+            android:screenOrientation="portrait" />
         <!--新的朋友列表-->
         <activity
             android:name=".ui.activity.NewFriendListActivity"

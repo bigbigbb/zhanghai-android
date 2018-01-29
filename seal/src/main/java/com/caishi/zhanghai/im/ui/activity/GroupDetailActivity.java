@@ -942,6 +942,12 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
                     }
                 });
                 break;
+
+            case R.id.group_member_apply_lly:
+                Intent intent1 = new Intent(GroupDetailActivity.this,GroupApplyListAc.class);
+                intent1.putExtra("fromConversationId",fromConversationId);
+                startActivity(intent1);
+                break;
         }
     }
 
@@ -1297,6 +1303,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         LinearLayout mGroupPortL = (LinearLayout) findViewById(R.id.ll_group_port);
         LinearLayout mGroupNameL = (LinearLayout) findViewById(R.id.ll_group_name);
         LinearLayout ll_user_name = (LinearLayout) findViewById(R.id.ll_user_name);
+        RelativeLayout group_member_apply_lly = (RelativeLayout) findViewById(R.id.group_member_apply_lly);
         mGroupAnnouncementDividerLinearLayout = (LinearLayout) findViewById(R.id.ac_ll_group_announcement_divider);
         mGroupNotice = (LinearLayout) findViewById(R.id.group_announcement);
         mSearchMessagesLinearLayout = (LinearLayout) findViewById(R.id.ac_ll_search_chatting_records);
@@ -1313,6 +1320,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         mDismissBtn.setOnClickListener(this);
         groupClean.setOnClickListener(this);
         mGroupNotice.setOnClickListener(this);
+        group_member_apply_lly.setOnClickListener(this);
         mSearchMessagesLinearLayout.setOnClickListener(this);
     }
 

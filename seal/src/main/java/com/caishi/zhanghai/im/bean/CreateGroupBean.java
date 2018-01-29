@@ -13,7 +13,7 @@ public class CreateGroupBean {
      * rid : xxyy
      * m : group
      * k : create
-     * v : {"groupName":"吃喝玩乐群","groupMemberList":["e10adc3949ba59abbe56e057f20f883e","e10adc3949ba59abbe56e057f20f883e"],"is_join_via_pay":"1","join_amount":"10.00","is_recheck_paid":"0","is_view_each":"0","is_invite_each":"0"}
+     * v : {"groupName":"吃喝玩乐群","groupMemberList":["e10adc3949ba59abbe56e057f20f883e","e10adc3949ba59abbe56e057f20f883e"],"join_direct":"1","is_join_via_pay":"1","join_amount":"10.00","is_view_each":"0","is_invite_each":"0"}
      */
 
     private String rid;
@@ -57,17 +57,17 @@ public class CreateGroupBean {
         /**
          * groupName : 吃喝玩乐群
          * groupMemberList : ["e10adc3949ba59abbe56e057f20f883e","e10adc3949ba59abbe56e057f20f883e"]
+         * join_direct : 1
          * is_join_via_pay : 1
          * join_amount : 10.00
-         * is_recheck_paid : 0
          * is_view_each : 0
          * is_invite_each : 0
          */
 
         private String groupName;
+        private String join_direct;
         private String is_join_via_pay;
         private String join_amount;
-        private String is_recheck_paid;
         private String is_view_each;
         private String is_invite_each;
         private List<String> groupMemberList;
@@ -78,6 +78,14 @@ public class CreateGroupBean {
 
         public void setGroupName(String groupName) {
             this.groupName = groupName;
+        }
+
+        public String getJoin_direct() {
+            return join_direct;
+        }
+
+        public void setJoin_direct(String join_direct) {
+            this.join_direct = join_direct;
         }
 
         public String getIs_join_via_pay() {
@@ -94,14 +102,6 @@ public class CreateGroupBean {
 
         public void setJoin_amount(String join_amount) {
             this.join_amount = join_amount;
-        }
-
-        public String getIs_recheck_paid() {
-            return is_recheck_paid;
-        }
-
-        public void setIs_recheck_paid(String is_recheck_paid) {
-            this.is_recheck_paid = is_recheck_paid;
         }
 
         public String getIs_view_each() {
