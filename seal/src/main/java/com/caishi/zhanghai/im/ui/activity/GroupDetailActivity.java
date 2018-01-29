@@ -118,7 +118,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
     private String fromConversationId;
     private Conversation.ConversationType mConversationType;
     private boolean isFromConversation;
-    private LinearLayout mGroupAnnouncementDividerLinearLayout;
+    private LinearLayout mGroupAnnouncementDividerLinearLayout,detail_group_lly_setting;
     private TextView mGroupName,mTvName;
     private PhotoUtils photoUtils;
     private BottomMenuDialog dialog;
@@ -354,8 +354,10 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
             });
         }
 
-        if (mGroup.getRole().equals(cacheAccount))
+        if (mGroup.getRole().equals(cacheAccount)) {
             isCreated = true;
+            detail_group_lly_setting.setVisibility(View.VISIBLE);
+        }
         if (!isCreated) {
             mGroupAnnouncementDividerLinearLayout.setVisibility(View.VISIBLE);
             mGroupNotice.setVisibility(View.VISIBLE);
@@ -1303,6 +1305,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         LinearLayout mGroupPortL = (LinearLayout) findViewById(R.id.ll_group_port);
         LinearLayout mGroupNameL = (LinearLayout) findViewById(R.id.ll_group_name);
         LinearLayout ll_user_name = (LinearLayout) findViewById(R.id.ll_user_name);
+        detail_group_lly_setting = (LinearLayout)findViewById(R.id.detail_group_lly_setting);
         RelativeLayout group_member_apply_lly = (RelativeLayout) findViewById(R.id.group_member_apply_lly);
         mGroupAnnouncementDividerLinearLayout = (LinearLayout) findViewById(R.id.ac_ll_group_announcement_divider);
         mGroupNotice = (LinearLayout) findViewById(R.id.group_announcement);

@@ -3,9 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="match_parent"
+    android:background="@color/white"
     android:layout_height="70dp">
-
+    <RadioButton
+        android:visibility="gone"
+        android:layout_marginLeft="10dp"
+        android:layout_centerVertical="true"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:id="@+id/rb_select_one"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
     <com.caishi.zhanghai.im.server.widget.SelectableRoundedImageView
+        android:layout_toRightOf="@id/rb_select_one"
         android:id="@+id/search_item_header"
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -35,7 +45,7 @@
         android:layout_below="@id/search_item_name"
         android:text="2018-01-19 12:12"
         android:layout_toRightOf="@id/search_item_header"
-        android:id="@+id/search_item_owner"
+        android:id="@+id/search_item_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
@@ -43,29 +53,60 @@
         android:textColor="@color/group_list_gray"
         android:textSize="14sp" />
     <TextView
+        android:visibility="gone"
         android:layout_marginTop="5dp"
         android:layout_marginLeft="10dp"
         android:layout_below="@id/search_item_name"
         android:text="已付费：10"
-        android:layout_toRightOf="@id/search_item_owner"
-        android:id="@+id/search_item_count"
+        android:layout_toRightOf="@id/search_item_time"
+        android:id="@+id/search_item_pay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:maxLines="1"
         android:textColor="@color/group_list_gray"
         android:textSize="14sp" />
-    <Button
-        android:layout_alignParentRight="true"
-        android:id="@+id/btn_search_group"
-        android:textSize="14sp"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="30dip"
-        android:layout_marginRight="20dip"
-        android:layout_marginTop="14dip"
-        android:background="@drawable/rs_select_btn_blue"
-        android:text="同意入群"
-        android:textColor="#FFFFFF" />
 
+
+    <LinearLayout
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+        <Button
+            android:id="@+id/btn_group_agree"
+            android:textSize="12sp"
+            android:layout_width="80dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginRight="20dip"
+            android:background="@drawable/rs_select_btn_blue"
+            android:text="同意入群"
+            android:textColor="#FFFFFF" />
+        <Button
+            android:visibility="gone"
+            android:id="@+id/btn_group_ingore"
+            android:textSize="12sp"
+            android:layout_width="80dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginRight="20dip"
+            android:layout_marginTop="5dip"
+            android:background="@drawable/rs_select_btn_blue"
+            android:text="忽略请求"
+            android:textColor="#FFFFFF" />
+        <Button
+            android:visibility="gone"
+            android:layout_marginTop="5dip"
+            android:id="@+id/btn_group_reject"
+            android:textSize="14sp"
+            android:layout_width="80dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginRight="20dip"
+            android:background="@drawable/rs_select_btn_blue"
+            android:text="拒绝拉黑"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
 </RelativeLayout>

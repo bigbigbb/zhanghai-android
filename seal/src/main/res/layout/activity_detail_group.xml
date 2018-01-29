@@ -366,6 +366,201 @@
                     android:background="#dfdfdd" />
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/detail_group_lly_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                >
+                <LinearLayout
+
+                    android:id="@+id/ll_group_one"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/btn_list_item_bg"
+                    android:orientation="horizontal"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="10dp"
+                        android:text="申请入群无须审核"
+                        android:textColor="@color/text_color"
+                        android:textSize="16sp" />
+
+                    <com.caishi.zhanghai.im.ui.widget.switchbutton.SwitchButton
+                        android:id="@+id/sw_group_one"
+                        style="@style/SwitchButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:padding="8dp"
+                        app:kswAnimationDuration="300"
+                        app:kswBackDrawable="@drawable/ios_back_drawable"
+                        app:kswBackMeasureRatio="1.4"
+                        app:kswThumbDrawable="@drawable/ios_thumb"
+                        app:kswThumbMarginBottom="-8dp"
+                        app:kswThumbMarginLeft="-5dp"
+                        app:kswThumbMarginRight="-5dp"
+                        app:kswThumbMarginTop="-2.5dp" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+
+                    android:id="@+id/ll_group_two"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:background="@drawable/btn_list_item_bg"
+                    android:orientation="horizontal"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="10dp"
+                        android:text="付费入群"
+                        android:textColor="@color/text_color"
+                        android:textSize="16sp" />
+
+                    <com.caishi.zhanghai.im.ui.widget.switchbutton.SwitchButton
+                        android:id="@+id/sw_group_two"
+                        style="@style/SwitchButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:padding="8dp"
+                        app:kswAnimationDuration="300"
+                        app:kswBackDrawable="@drawable/ios_back_drawable"
+                        app:kswBackMeasureRatio="1.4"
+                        app:kswThumbDrawable="@drawable/ios_thumb"
+                        app:kswThumbMarginBottom="-8dp"
+                        app:kswThumbMarginLeft="-5dp"
+                        app:kswThumbMarginRight="-5dp"
+                        app:kswThumbMarginTop="-2.5dp" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_group_two_two"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:background="@drawable/btn_list_item_bg"
+                    android:orientation="horizontal"
+                    android:padding="5dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="10dp"
+                        android:text="请输入进群需要支付的费用(元)"
+                        android:textColor="@color/text_color"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/tv_group_two_two"
+                        android:layout_width="60dp"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:text="10" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+
+                    android:id="@+id/ll_group_three"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:background="@drawable/btn_list_item_bg"
+                    android:orientation="horizontal"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="10dp"
+                        android:text="群成员可以互相查看资料"
+                        android:textColor="@color/text_color"
+                        android:textSize="16sp" />
+
+                    <com.caishi.zhanghai.im.ui.widget.switchbutton.SwitchButton
+                        android:id="@+id/sw_group_three"
+                        style="@style/SwitchButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:padding="8dp"
+                        app:kswAnimationDuration="300"
+                        app:kswBackDrawable="@drawable/ios_back_drawable"
+                        app:kswBackMeasureRatio="1.4"
+                        app:kswThumbDrawable="@drawable/ios_thumb"
+                        app:kswThumbMarginBottom="-8dp"
+                        app:kswThumbMarginLeft="-5dp"
+                        app:kswThumbMarginRight="-5dp"
+                        app:kswThumbMarginTop="-2.5dp" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+
+                    android:id="@+id/ll_group_four"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:background="@drawable/btn_list_item_bg"
+                    android:orientation="horizontal"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="10dp"
+                        android:text="群成员可以互相添加资料"
+                        android:textColor="@color/text_color"
+                        android:textSize="16sp" />
+
+                    <com.caishi.zhanghai.im.ui.widget.switchbutton.SwitchButton
+                        android:id="@+id/sw_group_four"
+                        style="@style/SwitchButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:padding="8dp"
+                        app:kswAnimationDuration="300"
+                        app:kswBackDrawable="@drawable/ios_back_drawable"
+                        app:kswBackMeasureRatio="1.4"
+                        app:kswThumbDrawable="@drawable/ios_thumb"
+                        app:kswThumbMarginBottom="-8dp"
+                        app:kswThumbMarginLeft="-5dp"
+                        app:kswThumbMarginRight="-5dp"
+                        app:kswThumbMarginTop="-2.5dp" />
+
+
+                </LinearLayout>
+            </LinearLayout>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0.25dp"

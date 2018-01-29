@@ -1,9 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
+    android:background="#f0f0f6"
     android:layout_height="match_parent">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <RadioButton
+            android:layout_marginLeft="10dp"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:id="@+id/rb_select_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_gravity="center_vertical"
+            android:gravity="right"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+            <Button
+                android:id="@+id/btn_group_agree"
+                android:textSize="14sp"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dip"
+                android:layout_marginTop="14dip"
+                android:background="@drawable/rs_select_btn_blue"
+                android:text="同意入群"
+                android:textColor="#FFFFFF" />
+            <Button
+                android:id="@+id/btn_group_ingore"
+                android:textSize="14sp"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dip"
+                android:layout_marginTop="14dip"
+                android:background="@drawable/rs_select_btn_blue"
+                android:text="忽略请求"
+                android:textColor="#FFFFFF" />
+            <Button
+                android:id="@+id/btn_group_reject"
+                android:textSize="14sp"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dip"
+                android:layout_marginTop="14dip"
+                android:background="@drawable/rs_select_btn_blue"
+                android:text="拒绝拉黑"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
+    </LinearLayout>
     <ListView
+        android:layout_marginTop="10dp"
+        android:divider="@null"
+        android:dividerHeight="3dp"
         android:id="@+id/lv_group_apply_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"></ListView>
