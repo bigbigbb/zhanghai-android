@@ -6,13 +6,14 @@ package com.caishi.zhanghai.im.bean;
 
 public class GroupInfoReturnBean {
 
+
     /**
-     * rid : 1516935337771
+     * rid : 1517286817787
      * m : group
      * k : info
      * v : ok
      * desc : 获取成功
-     * data : {"id":"9132e3d4fb60295686ccdbcbe1ac3af8","code":900017,"name":"221111","portraitUri":"http://zhanghai.looklaw.cn/upavatar/6309d2d98922359173b9931e9110ed2c_20180124202601.jpg","memberCount":2,"maxMemberCount":500,"creatorId":"6309d2d98922359173b9931e9110ed2c","type":1,"bulletin":null,"deletedAt":null}
+     * data : {"id":"419eb9e7a964a8ea2a9ba43584eef937","code":900052,"name":"测试333","myDisplayName":null,"join_direct":0,"is_join_via_pay":"0.00","join_amount":"0.00","is_view_each":0,"is_invite_each":0,"portraitUri":"http://zhanghai.looklaw.cn/avatar/?name=%E6%B5%8B%E8%AF%95333","memberCount":2,"maxMemberCount":500,"creatorId":"7ef80afb69f80b130dade78e82b45ff7","type":1,"bulletin":null,"deletedAt":null}
      */
 
     private String rid;
@@ -72,13 +73,19 @@ public class GroupInfoReturnBean {
 
     public static class DataBean {
         /**
-         * id : 9132e3d4fb60295686ccdbcbe1ac3af8
-         * code : 900017
-         * name : 221111
-         * portraitUri : http://zhanghai.looklaw.cn/upavatar/6309d2d98922359173b9931e9110ed2c_20180124202601.jpg
+         * id : 419eb9e7a964a8ea2a9ba43584eef937
+         * code : 900052
+         * name : 测试333
+         * myDisplayName : null
+         * join_direct : 0
+         * is_join_via_pay : 0.00
+         * join_amount : 0.00
+         * is_view_each : 0
+         * is_invite_each : 0
+         * portraitUri : http://zhanghai.looklaw.cn/avatar/?name=%E6%B5%8B%E8%AF%95333
          * memberCount : 2
          * maxMemberCount : 500
-         * creatorId : 6309d2d98922359173b9931e9110ed2c
+         * creatorId : 7ef80afb69f80b130dade78e82b45ff7
          * type : 1
          * bulletin : null
          * deletedAt : null
@@ -87,6 +94,12 @@ public class GroupInfoReturnBean {
         private String id;
         private int code;
         private String name;
+        private Object myDisplayName;
+        private int join_direct;
+        private String is_join_via_pay;
+        private String join_amount;
+        private int is_view_each;
+        private int is_invite_each;
         private String portraitUri;
         private int memberCount;
         private int maxMemberCount;
@@ -117,6 +130,54 @@ public class GroupInfoReturnBean {
 
         public void setName(String name) {
             this.name = name;
+        }
+
+        public Object getMyDisplayName() {
+            return myDisplayName;
+        }
+
+        public void setMyDisplayName(Object myDisplayName) {
+            this.myDisplayName = myDisplayName;
+        }
+
+        public int getJoin_direct() {
+            return join_direct;
+        }
+
+        public void setJoin_direct(int join_direct) {
+            this.join_direct = join_direct;
+        }
+
+        public String getIs_join_via_pay() {
+            return is_join_via_pay;
+        }
+
+        public void setIs_join_via_pay(String is_join_via_pay) {
+            this.is_join_via_pay = is_join_via_pay;
+        }
+
+        public String getJoin_amount() {
+            return join_amount;
+        }
+
+        public void setJoin_amount(String join_amount) {
+            this.join_amount = join_amount;
+        }
+
+        public int getIs_view_each() {
+            return is_view_each;
+        }
+
+        public void setIs_view_each(int is_view_each) {
+            this.is_view_each = is_view_each;
+        }
+
+        public int getIs_invite_each() {
+            return is_invite_each;
+        }
+
+        public void setIs_invite_each(int is_invite_each) {
+            this.is_invite_each = is_invite_each;
         }
 
         public String getPortraitUri() {

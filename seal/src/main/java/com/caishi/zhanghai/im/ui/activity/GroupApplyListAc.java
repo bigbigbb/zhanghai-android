@@ -23,6 +23,7 @@ import com.caishi.zhanghai.im.bean.QuitGroupBean;
 import com.caishi.zhanghai.im.net.CallBackJson;
 import com.caishi.zhanghai.im.net.SocketClient;
 import com.caishi.zhanghai.im.server.utils.NToast;
+import com.caishi.zhanghai.im.server.widget.LoadDialog;
 import com.caishi.zhanghai.im.server.widget.SelectableRoundedImageView;
 import com.google.gson.Gson;
 
@@ -89,6 +90,7 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
                         stringAccounts.add(dataBean.getAccount());
                     }
                 }
+                LoadDialog.show(mContext);
                 agreeGroup();
                 break;
         }
@@ -168,8 +170,12 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
                     break;
 
                 case 2://同意入群
+                    LoadDialog.dismiss(mContext);
                     BaseReturnBean baseReturnBean = (BaseReturnBean) msg.obj;
                     NToast.longToast(getApplication(), baseReturnBean.getDesc());
+                    if(baseReturnBean.getV().equals("ok")){
+                        getGroupApply();
+                    }
 
 
                     break;
@@ -205,6 +211,7 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
             TextView search_item_name = (TextView) view.findViewById(R.id.search_item_name);
             TextView search_item_time = (TextView) view.findViewById(R.id.search_item_time);
             RadioButton rb_select_one = (RadioButton) view.findViewById(R.id.rb_select_one);
+            Button btn_group_agree = (Button) view.findViewById(R.id.btn_group_agree);
 
             if (null != dataBeanList && dataBeanList.size() > 0) {
                 dataBean = dataBeanList.get(i);
@@ -212,9 +219,19 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
                     ImageLoader.getInstance().displayImage(dataBean.getPortraitUri(), search_item_header, App.getOptions());
                     search_item_name.setText(dataBean.getNickname());
                     search_item_time.setText(dataBean.getApply_time());
+
+                    if(dataBean.getPassed()==1){
+                        btn_group_agree.setText("已同意");
+                        btn_group_agree.setFocusable(false);
+                        btn_group_agree.setClickable(false);
+                        btn_group_agree.setBackgroundColor(getResources().getColor(R.color.gray));
+                    }else {
+                        btn_group_agree.setText("同意进群");
+                    }
                 }
 
             }
+
 
             rb_select_one.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -226,6 +243,15 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
                         dataBean.setCheck(false);
                         b = !b;
                     }
+                }
+            });
+
+            btn_group_agree.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    stringAccounts.add(dataBean.getAccount());
+                    LoadDialog.show(mContext);
+                    agreeGroup();
                 }
             });
 

@@ -148,7 +148,7 @@ public class GroupListActivity extends BaseActivity {
             GroupListReturnBean groupListReturnBean   =  (GroupListReturnBean) msg.obj;
             if(null!=groupListReturnBean){
                 List<GroupListReturnBean.DataBean> listReturnBeans = groupListReturnBean.getData();
-                if(listReturnBeans.size()>0){
+                if(null!=listReturnBeans&&listReturnBeans.size()>0){
                     Groups groups = null;
                     mList = new ArrayList<>();
                     for (GroupListReturnBean.DataBean dataBean:listReturnBeans){

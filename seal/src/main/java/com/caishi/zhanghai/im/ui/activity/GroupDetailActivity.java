@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +29,8 @@ import com.caishi.zhanghai.im.bean.BaseReturnBean;
 import com.caishi.zhanghai.im.bean.BeanBean;
 import com.caishi.zhanghai.im.bean.ChangeGUserNameBean;
 import com.caishi.zhanghai.im.bean.ChangeGroupNameBean;
+import com.caishi.zhanghai.im.bean.ChangeGroupSettingBean;
+import com.caishi.zhanghai.im.bean.CreateGroupBean;
 import com.caishi.zhanghai.im.bean.GroupInfoReturnBean;
 import com.caishi.zhanghai.im.bean.GroupListReturnBean;
 import com.caishi.zhanghai.im.bean.GroupMembersReturnBean;
@@ -42,6 +46,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,26 +116,30 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
     private boolean isCreated = false;
     private DemoGridView mGridView;
     private List<GroupMember> mGroupMember;
+    private LinearLayout ll_group_two_two;
     private TextView mTextViewMemberSize, mGroupDisplayNameText;
     private SelectableRoundedImageView mGroupHeader;
     private SwitchButton messageTop, messageNotification;
+    private SwitchButton sw_group_one,sw_group_two,sw_group_three,sw_group_four;
     private Groups mGroup;
     private String fromConversationId;
     private Conversation.ConversationType mConversationType;
     private boolean isFromConversation;
-    private LinearLayout mGroupAnnouncementDividerLinearLayout,detail_group_lly_setting;
-    private TextView mGroupName,mTvName;
+    private LinearLayout mGroupAnnouncementDividerLinearLayout, detail_group_lly_setting;
+    private RelativeLayout group_member_apply_lly;
+    private TextView mGroupName, mTvName,tv_group_two_two;
     private PhotoUtils photoUtils;
     private BottomMenuDialog dialog;
     private UploadManager uploadManager;
     private String imageUrl;
     private Uri selectUri;
-    private String newGroupName,cacheAccount,newNickName;
+    private String newGroupName, cacheAccount, newNickName;
     private LinearLayout mGroupNotice;
     private LinearLayout mSearchMessagesLinearLayout;
     private Button mDismissBtn;
     private Button mQuitBtn;
     private SealSearchConversationResult mResult;
+    private boolean isOpen = false;
 
 
     @Override
@@ -141,7 +150,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         setTitle(R.string.group_info);
 
         SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
-         cacheAccount = sp.getString("loginAccount", "");
+        cacheAccount = sp.getString("loginAccount", "");
         //群组会话界面点进群组详情
         fromConversationId = getIntent().getStringExtra("TargetId");
         mConversationType = (Conversation.ConversationType) getIntent().getSerializableExtra("conversationType");
@@ -214,6 +223,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
             }
         });
     }
+
     private void changeGroupName() {
         ChangeGroupNameBean groupBean = new ChangeGroupNameBean();
         groupBean.setK("setname");
@@ -315,6 +325,41 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         ImageLoader.getInstance().displayImage(portraitUri, mGroupHeader, App.getOptions());
         mGroupName.setText(mGroup.getDisplayName());
 
+        /**
+         * join_direct : 0
+         * is_join_via_pay : 0.00
+         * join_amount : 0.00
+         * is_view_each : 0
+         * is_invite_each : 0
+         */
+        int join_direct = groupInfoBean.getJoin_direct();
+        String  join_amount = groupInfoBean.getJoin_amount();
+        int  is_view_each = groupInfoBean.getIs_view_each();
+        int is_invite_each = groupInfoBean.getIs_invite_each();
+        String  is_join_via_pay = groupInfoBean.getIs_join_via_pay();
+        if(join_direct == 1){
+            sw_group_one.setChecked(true);
+        }else {
+            sw_group_one.setChecked(false);
+        }
+        if(is_view_each == 1){
+            sw_group_three.setChecked(true);
+        }else {
+            sw_group_three.setChecked(false);
+        }
+        if(is_invite_each == 1){
+            sw_group_four.setChecked(true);
+        }else {
+            sw_group_four.setChecked(false);
+        }
+        if(is_join_via_pay.equals("0.00")){
+            sw_group_two.setChecked(false);
+            ll_group_two_two.setVisibility(View.GONE);
+        }else {
+            sw_group_two.setChecked(true);
+            ll_group_two_two.setVisibility(View.VISIBLE);
+        }
+        tv_group_two_two.setText(join_amount);
         if (RongIM.getInstance() != null) {
             RongIM.getInstance().getConversation(Conversation.ConversationType.GROUP, mGroup.getGroupsId(), new RongIMClient.ResultCallback<Conversation>() {
                 @Override
@@ -357,7 +402,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         if (mGroup.getRole().equals(cacheAccount)) {
             isCreated = true;
             detail_group_lly_setting.setVisibility(View.VISIBLE);
-
+            group_member_apply_lly.setVisibility(View.VISIBLE);
 
 
         }
@@ -415,9 +460,9 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
                 if (null != baseReturnBean) {
                     Message message = new Message();
                     message.obj = baseReturnBean;
-                    if(type.equals("quit")){
+                    if (type.equals("quit")) {
                         message.what = 0;
-                    }else if(type.equals("dismiss")){
+                    } else if (type.equals("dismiss")) {
                         message.what = 3;
                     }
 
@@ -430,11 +475,69 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
 
     }
 
+    private boolean is_join_direct = false;
+    private boolean is_join_via_pay = false;
+    private boolean is_view_each = false;
+    private boolean is_invite_each = false;
+
+    private void changeSetting(String key,String value) {
+        String joinAmount = tv_group_two_two.getText().toString();
+        ChangeGroupSettingBean changeGroupSettingBean = new ChangeGroupSettingBean();
+        changeGroupSettingBean.setK("config");
+        changeGroupSettingBean.setM("group");
+        changeGroupSettingBean.setRid(String.valueOf(System.currentTimeMillis()));
+        ChangeGroupSettingBean.VBean vBean = new ChangeGroupSettingBean.VBean();
+        vBean.setGroupId(fromConversationId);
+        vBean.setKey(key);
+        vBean.setValue(value);
+//        vBean.setGroupName(mGroupName);
+//        if (is_join_direct) {
+//            vBean.setJoin_direct("1");
+//        } else {
+//            vBean.setJoin_direct("0");
+//        }
+//        if (is_join_via_pay) {
+//            vBean.setIs_join_via_pay("1");
+//            vBean.setJoin_amount(joinAmount);
+//        } else {
+//            vBean.setIs_join_via_pay("0");
+//            vBean.setJoin_amount("0");
+//        }
+//
+//
+//        if (is_view_each) {
+//            vBean.setIs_view_each("1");
+//        } else {
+//            vBean.setIs_view_each("0");
+//        }
+//
+//        if (is_invite_each) {
+//            vBean.setIs_invite_each("1");
+//        } else {
+//            vBean.setIs_invite_each("0");
+//        }
+
+        changeGroupSettingBean.setV(vBean);
+
+        String msg = new Gson().toJson(changeGroupSettingBean);
+        SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
+            @Override
+            public void returnJson(String json) {
+                Log.e("msg1111", json);
+                BaseReturnBean baseReturnBean = new Gson().fromJson(json, BaseReturnBean.class);
+                if (null != baseReturnBean) {
+                    Message message = new Message();
+                    message.obj = baseReturnBean;
+                    message.what = 6;
+
+                    handler.sendMessage(message);
+                }
+            }
+        });
+    }
 
 
-
-
-
+    private GroupInfoReturnBean.DataBean groupInfoBean;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -477,14 +580,14 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
                     GroupInfoReturnBean groupInfoReturnBean = (GroupInfoReturnBean) msg.obj;
                     NToast.shortToast(getApplication(), groupInfoReturnBean.getDesc());
                     if (groupInfoReturnBean.getV().equals("ok")) {
-                        GroupInfoReturnBean.DataBean dataBean = groupInfoReturnBean.getData();
+                        groupInfoBean = groupInfoReturnBean.getData();
                         mGroup = new Groups();
-                        if (!TextUtils.isEmpty(dataBean.getPortraitUri())) {
-                            mGroup.setPortraitUri(dataBean.getPortraitUri());
+                        if (!TextUtils.isEmpty(groupInfoBean.getPortraitUri())) {
+                            mGroup.setPortraitUri(groupInfoBean.getPortraitUri());
                         }
-                        mGroup.setDisplayName(dataBean.getName());
-                        mGroup.setGroupsId(dataBean.getId());
-                        mGroup.setRole(dataBean.getCreatorId());
+                        mGroup.setDisplayName(groupInfoBean.getName());
+                        mGroup.setGroupsId(groupInfoBean.getId());
+                        mGroup.setRole(groupInfoBean.getCreatorId());
 
                         initGroupData();
                     }
@@ -493,18 +596,18 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
 
                 case 2://获取群成员消息
                     GroupMembersReturnBean groupMembersReturnBean = (GroupMembersReturnBean) msg.obj;
-                    NToast.longToast(getApplication(),groupMembersReturnBean.getDesc());
-                    if(groupMembersReturnBean.getV().equals("ok")){
+                    NToast.longToast(getApplication(), groupMembersReturnBean.getDesc());
+                    if (groupMembersReturnBean.getV().equals("ok")) {
                         LoadDialog.dismiss(mContext);
                         List<GroupMembersReturnBean.DataBean> dataBeanList = groupMembersReturnBean.getData();
                         if (dataBeanList != null && dataBeanList.size() > 0) {
                             mGroupMember = new ArrayList<>();
                             GroupMember groupMember = null;
-                            for (GroupMembersReturnBean.DataBean dataBean:dataBeanList){
-                                groupMember = new GroupMember(dataBean.getUser().getId(),dataBean.getUser().getNickname(),Uri.parse((String) dataBean.getUser().getPortraitUri()));
+                            for (GroupMembersReturnBean.DataBean dataBean : dataBeanList) {
+                                groupMember = new GroupMember(dataBean.getUser().getId(), dataBean.getUser().getNickname(), Uri.parse((String) dataBean.getUser().getPortraitUri()));
 
                                 mGroupMember.add(groupMember);
-                                if(groupMember.getUserId().equals(cacheAccount)){
+                                if (groupMember.getUserId().equals(cacheAccount)) {
                                     String nickName = groupMember.getName();
                                     mTvName.setText(nickName);
                                 }
@@ -572,6 +675,14 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
                         mTvName.setText(newNickName);
                         LoadDialog.dismiss(mContext);
                         NToast.shortToast(mContext, getString(R.string.update_success));
+                    }
+                    break;
+                case 6:
+                    BaseReturnBean baseReturnBean6 = (BaseReturnBean) msg.obj;
+                    NToast.longToast(getApplication(), baseReturnBean6.getDesc());
+                    LoadDialog.dismiss(mContext);
+                    if (baseReturnBean6.getV().equals("ok")) {
+
                     }
                     break;
             }
@@ -903,8 +1014,8 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
 
                         }
                     });
-                }else {
-                    NToast.longToast(getApplication(),"只有群主才能修改群名称");
+                } else {
+                    NToast.longToast(getApplication(), "只有群主才能修改群名称");
                 }
                 break;
             case R.id.group_announcement:
@@ -949,13 +1060,14 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
                 break;
 
             case R.id.group_member_apply_lly:
-                Intent intent1 = new Intent(GroupDetailActivity.this,GroupApplyListAc.class);
-                intent1.putExtra("fromConversationId",fromConversationId);
+                Intent intent1 = new Intent(GroupDetailActivity.this, GroupApplyListAc.class);
+                intent1.putExtra("fromConversationId", fromConversationId);
                 startActivity(intent1);
                 break;
         }
     }
 
+    private boolean isOpen1,isOpen2,isOpen3,isOpen4 = false;
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         switch (buttonView.getId()) {
@@ -981,6 +1093,75 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
                     }
                 }
 
+                break;
+            case R.id.sw_group_one:
+
+
+                if (isChecked) {
+                    is_join_direct = true;
+                    if(isOpen1){
+                        changeSetting("join_direct","1");
+                    }
+
+                } else {
+                    is_join_direct = false;
+                    if(isOpen1){
+                        changeSetting("join_direct","0");
+                    }
+
+                }
+                isOpen1 =true;
+
+                break;
+            case R.id.sw_group_two:
+                if (isChecked) {
+                    is_join_via_pay = true;
+                    ll_group_two_two.setVisibility(View.VISIBLE);
+                    if(isOpen2){
+                        changeSetting("is_join_via_pay","1");
+                    }
+
+                } else {
+                    is_join_via_pay = false;
+                    ll_group_two_two.setVisibility(View.GONE);
+                    if(isOpen2){
+                        changeSetting("is_join_via_pay","0");
+                    }
+
+                }
+                isOpen2 =true;
+                break;
+            case R.id.sw_group_three:
+                if (isChecked) {
+                    is_view_each = true;
+                    if(isOpen3){
+                        changeSetting("is_view_each","1");
+                    }
+
+                } else {
+                    is_view_each = false;
+                    if(isOpen3){
+                        changeSetting("is_view_each","0");
+                    }
+
+                }
+                isOpen3 =true;
+                break;
+            case R.id.sw_group_four:
+                if (isChecked) {
+                    is_invite_each = true;
+                    if(isOpen4){
+                        changeSetting("is_invite_each","1");
+                    }
+
+                } else {
+                    is_invite_each = false;
+                    if(isOpen4){
+                        changeSetting("is_invite_each","0");
+                    }
+
+                }
+                isOpen4 =true;
                 break;
         }
     }
@@ -1289,6 +1470,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
 
 
     private void initViews() {
+        tv_group_two_two = (TextView) findViewById(R.id.tv_group_two_two);
         messageTop = (SwitchButton) findViewById(R.id.sw_group_top);
         messageNotification = (SwitchButton) findViewById(R.id.sw_group_notfaction);
         messageTop.setOnCheckedChangeListener(this);
@@ -1305,11 +1487,16 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         mDismissBtn = (Button) findViewById(R.id.group_dismiss);
         RelativeLayout totalGroupMember = (RelativeLayout) findViewById(R.id.group_member_size_item);
         RelativeLayout memberOnlineStatus = (RelativeLayout) findViewById(R.id.group_member_online_status);
+        sw_group_one = (SwitchButton) findViewById(R.id.sw_group_one);
+        sw_group_two = (SwitchButton) findViewById(R.id.sw_group_two);
+        sw_group_three = (SwitchButton) findViewById(R.id.sw_group_three);
+        sw_group_four = (SwitchButton) findViewById(R.id.sw_group_four);
+        ll_group_two_two = (LinearLayout) findViewById(R.id.ll_group_two_two);
         LinearLayout mGroupPortL = (LinearLayout) findViewById(R.id.ll_group_port);
         LinearLayout mGroupNameL = (LinearLayout) findViewById(R.id.ll_group_name);
         LinearLayout ll_user_name = (LinearLayout) findViewById(R.id.ll_user_name);
-        detail_group_lly_setting = (LinearLayout)findViewById(R.id.detail_group_lly_setting);
-        RelativeLayout group_member_apply_lly = (RelativeLayout) findViewById(R.id.group_member_apply_lly);
+        detail_group_lly_setting = (LinearLayout) findViewById(R.id.detail_group_lly_setting);
+        group_member_apply_lly = (RelativeLayout) findViewById(R.id.group_member_apply_lly);
         mGroupAnnouncementDividerLinearLayout = (LinearLayout) findViewById(R.id.ac_ll_group_announcement_divider);
         mGroupNotice = (LinearLayout) findViewById(R.id.group_announcement);
         mSearchMessagesLinearLayout = (LinearLayout) findViewById(R.id.ac_ll_search_chatting_records);
@@ -1328,6 +1515,31 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         mGroupNotice.setOnClickListener(this);
         group_member_apply_lly.setOnClickListener(this);
         mSearchMessagesLinearLayout.setOnClickListener(this);
+//        if(isOpen){
+            sw_group_one.setOnCheckedChangeListener(this);
+            sw_group_two.setOnCheckedChangeListener(this);
+            sw_group_three.setOnCheckedChangeListener(this);
+            sw_group_four.setOnCheckedChangeListener(this);
+//        }
+
+
+        tv_group_two_two.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String e = editable.toString();
+                Log.e("editable",e);
+            }
+        });
     }
 
     @Override
