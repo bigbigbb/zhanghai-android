@@ -168,7 +168,7 @@ public class SearchGroupActivity extends BaseActivity {
         groupBean.setV(vBean);
         String msg = new Gson().toJson(groupBean);
 
-        SocketClient.getInstance().sendMsg(msg, new CallBackJson() {
+        SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
             @Override
             public void returnJson(String json) {
                 Log.e("json", json);

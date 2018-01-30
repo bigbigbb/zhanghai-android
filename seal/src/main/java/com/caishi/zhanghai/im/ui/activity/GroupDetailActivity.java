@@ -120,14 +120,14 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
     private TextView mTextViewMemberSize, mGroupDisplayNameText;
     private SelectableRoundedImageView mGroupHeader;
     private SwitchButton messageTop, messageNotification;
-    private SwitchButton sw_group_one,sw_group_two,sw_group_three,sw_group_four;
+    private SwitchButton sw_group_one, sw_group_two, sw_group_three, sw_group_four;
     private Groups mGroup;
     private String fromConversationId;
     private Conversation.ConversationType mConversationType;
     private boolean isFromConversation;
     private LinearLayout mGroupAnnouncementDividerLinearLayout, detail_group_lly_setting;
     private RelativeLayout group_member_apply_lly;
-    private TextView mGroupName, mTvName,tv_group_two_two;
+    private TextView mGroupName, mTvName, tv_group_two_two;
     private PhotoUtils photoUtils;
     private BottomMenuDialog dialog;
     private UploadManager uploadManager;
@@ -183,7 +183,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         groupBean.setV(vBean);
         String msg = new Gson().toJson(groupBean);
 
-        SocketClient.getInstance().sendMsg(msg, new CallBackJson() {
+        SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
             @Override
             public void returnJson(String json) {
                 Log.e("json", json);
@@ -209,7 +209,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         groupBean.setV(vBean);
         String msg = new Gson().toJson(groupBean);
 
-        SocketClient.getInstance().sendMsg(msg, new CallBackJson() {
+        SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
             @Override
             public void returnJson(String json) {
                 Log.e("json", json);
@@ -235,7 +235,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         groupBean.setV(vBean);
         String msg = new Gson().toJson(groupBean);
 
-        SocketClient.getInstance().sendMsg(msg, new CallBackJson() {
+        SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
             @Override
             public void returnJson(String json) {
                 Log.e("json", json);
@@ -261,7 +261,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         gUserNameBean.setV(vBean);
         String msg = new Gson().toJson(gUserNameBean);
 
-        SocketClient.getInstance().sendMsg(msg, new CallBackJson() {
+        SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
             @Override
             public void returnJson(String json) {
                 Log.e("json", json);
@@ -333,29 +333,29 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
          * is_invite_each : 0
          */
         int join_direct = groupInfoBean.getJoin_direct();
-        String  join_amount = groupInfoBean.getJoin_amount();
-        int  is_view_each = groupInfoBean.getIs_view_each();
+        String join_amount = groupInfoBean.getJoin_amount();
+        int is_view_each = groupInfoBean.getIs_view_each();
         int is_invite_each = groupInfoBean.getIs_invite_each();
-        String  is_join_via_pay = groupInfoBean.getIs_join_via_pay();
-        if(join_direct == 1){
+        String is_join_via_pay = groupInfoBean.getIs_join_via_pay();
+        if (join_direct == 1) {
             sw_group_one.setChecked(true);
-        }else {
+        } else {
             sw_group_one.setChecked(false);
         }
-        if(is_view_each == 1){
+        if (is_view_each == 1) {
             sw_group_three.setChecked(true);
-        }else {
+        } else {
             sw_group_three.setChecked(false);
         }
-        if(is_invite_each == 1){
+        if (is_invite_each == 1) {
             sw_group_four.setChecked(true);
-        }else {
+        } else {
             sw_group_four.setChecked(false);
         }
-        if(is_join_via_pay.equals("0.00")){
+        if (is_join_via_pay.equals("0.00")) {
             sw_group_two.setChecked(false);
             ll_group_two_two.setVisibility(View.GONE);
-        }else {
+        } else {
             sw_group_two.setChecked(true);
             ll_group_two_two.setVisibility(View.VISIBLE);
         }
@@ -480,7 +480,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
     private boolean is_view_each = false;
     private boolean is_invite_each = false;
 
-    private void changeSetting(String key,String value) {
+    private void changeSetting(String key, String value) {
         String joinAmount = tv_group_two_two.getText().toString();
         ChangeGroupSettingBean changeGroupSettingBean = new ChangeGroupSettingBean();
         changeGroupSettingBean.setK("config");
@@ -1067,7 +1067,8 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         }
     }
 
-    private boolean isOpen1,isOpen2,isOpen3,isOpen4 = false;
+    private boolean isOpen1, isOpen2, isOpen3, isOpen4 = false;
+
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         switch (buttonView.getId()) {
@@ -1099,69 +1100,69 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
 
                 if (isChecked) {
                     is_join_direct = true;
-                    if(isOpen1){
-                        changeSetting("join_direct","1");
+                    if (isOpen1) {
+                        changeSetting("join_direct", "1");
                     }
 
                 } else {
                     is_join_direct = false;
-                    if(isOpen1){
-                        changeSetting("join_direct","0");
+                    if (isOpen1) {
+                        changeSetting("join_direct", "0");
                     }
 
                 }
-                isOpen1 =true;
+                isOpen1 = true;
 
                 break;
             case R.id.sw_group_two:
                 if (isChecked) {
                     is_join_via_pay = true;
                     ll_group_two_two.setVisibility(View.VISIBLE);
-                    if(isOpen2){
-                        changeSetting("is_join_via_pay","1");
+                    if (isOpen2) {
+                        changeSetting("is_join_via_pay", "1");
                     }
 
                 } else {
                     is_join_via_pay = false;
                     ll_group_two_two.setVisibility(View.GONE);
-                    if(isOpen2){
-                        changeSetting("is_join_via_pay","0");
+                    if (isOpen2) {
+                        changeSetting("is_join_via_pay", "0");
                     }
 
                 }
-                isOpen2 =true;
+                isOpen2 = true;
                 break;
             case R.id.sw_group_three:
                 if (isChecked) {
                     is_view_each = true;
-                    if(isOpen3){
-                        changeSetting("is_view_each","1");
+                    if (isOpen3) {
+                        changeSetting("is_view_each", "1");
                     }
 
                 } else {
                     is_view_each = false;
-                    if(isOpen3){
-                        changeSetting("is_view_each","0");
+                    if (isOpen3) {
+                        changeSetting("is_view_each", "0");
                     }
 
                 }
-                isOpen3 =true;
+                isOpen3 = true;
                 break;
             case R.id.sw_group_four:
                 if (isChecked) {
                     is_invite_each = true;
-                    if(isOpen4){
-                        changeSetting("is_invite_each","1");
+                    if (isOpen4) {
+                        changeSetting("is_invite_each", "1");
                     }
 
                 } else {
                     is_invite_each = false;
-                    if(isOpen4){
-                        changeSetting("is_invite_each","0");
+                    if (isOpen4) {
+                        changeSetting("is_invite_each", "0");
                     }
 
                 }
-                isOpen4 =true;
+                isOpen4 = true;
                 break;
         }
     }
@@ -1516,10 +1517,10 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         group_member_apply_lly.setOnClickListener(this);
         mSearchMessagesLinearLayout.setOnClickListener(this);
 //        if(isOpen){
-            sw_group_one.setOnCheckedChangeListener(this);
-            sw_group_two.setOnCheckedChangeListener(this);
-            sw_group_three.setOnCheckedChangeListener(this);
-            sw_group_four.setOnCheckedChangeListener(this);
+        sw_group_one.setOnCheckedChangeListener(this);
+        sw_group_two.setOnCheckedChangeListener(this);
+        sw_group_three.setOnCheckedChangeListener(this);
+        sw_group_four.setOnCheckedChangeListener(this);
 //        }
 
 
@@ -1537,7 +1538,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
             @Override
             public void afterTextChanged(Editable editable) {
                 String e = editable.toString();
-                Log.e("editable",e);
+                Log.e("editable", e);
             }
         });
     }

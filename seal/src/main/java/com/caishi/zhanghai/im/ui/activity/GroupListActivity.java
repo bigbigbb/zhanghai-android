@@ -129,12 +129,12 @@ public class GroupListActivity extends BaseActivity {
             @Override
             public void returnJson(String json) {
                 Log.e("msg1111", json);
-                GroupListReturnBean baseReturnBean = new Gson().fromJson(json, GroupListReturnBean.class);
-                if (null != baseReturnBean) {
-                    Message message = new Message();
-                    message.obj = baseReturnBean;
-                    handler.sendMessage(message);
-                }
+//                GroupListReturnBean baseReturnBean = new Gson().fromJson(json, GroupListReturnBean.class);
+//                if (null != baseReturnBean) {
+//                    Message message = new Message();
+//                    message.obj = baseReturnBean;
+//                    handler.sendMessage(message);
+//                }
 
 
             }

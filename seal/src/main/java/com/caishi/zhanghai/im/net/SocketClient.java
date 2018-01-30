@@ -59,6 +59,8 @@ public class SocketClient {
         try {
             this.mContext = context;
             Socket so = new Socket(AppParm.IP, Integer.parseInt(AppParm.PORT));
+            // 设置输入流的接收缓冲区大小，默认是4KB，即4096字节
+//            so.setReceiveBufferSize(40096);
             mSocket = new WeakReference<Socket>(so);
             mReadThread = new ReadThread(so);
             mReadThread.start();
@@ -95,7 +97,7 @@ public class SocketClient {
         return new Gson().toJson(heartBean);
     }
 
-    public void sendMsg(String msg, CallBackJson classBack) {
+    private void sendMsg(String msg, CallBackJson classBack) {
         this.mClassBack = classBack;
         if (null != mSocket && null != mSocket.get()) {
             Socket soc = mSocket.get();
@@ -211,7 +213,7 @@ public class SocketClient {
                 Log.e("test", "会进来嘛？");
                 try {
                     InputStream is = socket.getInputStream();
-                    byte[] buffer = new byte[1024 * 4];
+                    byte[] buffer = new byte[1024 * 40];
                     int length = 0;
 
 

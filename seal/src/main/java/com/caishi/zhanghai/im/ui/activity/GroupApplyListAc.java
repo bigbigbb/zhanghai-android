@@ -91,7 +91,7 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
                     }
                 }
                 LoadDialog.show(mContext);
-                agreeGroup();
+                agreeGroup("agree");
                 break;
         }
     }
@@ -99,9 +99,9 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
 
     List<String> stringAccounts = new ArrayList<>();
 
-    private void agreeGroup() {
+    private void agreeGroup(String type) {
         AgreeGroupBean agreeGroupBean = new AgreeGroupBean();
-        agreeGroupBean.setK("agree");
+        agreeGroupBean.setK(type);
         agreeGroupBean.setM("group");
         agreeGroupBean.setRid(String.valueOf(System.currentTimeMillis()));
         AgreeGroupBean.VBean vBean = new AgreeGroupBean.VBean();
@@ -110,7 +110,7 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
         agreeGroupBean.setV(vBean);
         String msg = new Gson().toJson(agreeGroupBean);
 
-        SocketClient.getInstance().sendMsg(msg, new CallBackJson() {
+        SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
             @Override
             public void returnJson(String json) {
                 Log.e("json", json);
@@ -137,7 +137,7 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
         groupBean.setV(vBean);
         String msg = new Gson().toJson(groupBean);
 
-        SocketClient.getInstance().sendMsg(msg, new CallBackJson() {
+        SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
             @Override
             public void returnJson(String json) {
                 Log.e("json", json);
@@ -212,6 +212,8 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
             TextView search_item_time = (TextView) view.findViewById(R.id.search_item_time);
             RadioButton rb_select_one = (RadioButton) view.findViewById(R.id.rb_select_one);
             Button btn_group_agree = (Button) view.findViewById(R.id.btn_group_agree);
+            Button btn_group_ingore = (Button) view.findViewById(R.id.btn_group_ingore);
+            Button btn_group_reject = (Button) view.findViewById(R.id.btn_group_reject);
 
             if (null != dataBeanList && dataBeanList.size() > 0) {
                 dataBean = dataBeanList.get(i);
@@ -251,7 +253,24 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
                 public void onClick(View view) {
                     stringAccounts.add(dataBean.getAccount());
                     LoadDialog.show(mContext);
-                    agreeGroup();
+                    agreeGroup("agree");
+                }
+            });
+            btn_group_ingore.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    stringAccounts.add(dataBean.getAccount());
+                    LoadDialog.show(mContext);
+                    agreeGroup("ignore");
+                }
+            });
+
+            btn_group_reject.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    stringAccounts.add(dataBean.getAccount());
+                    LoadDialog.show(mContext);
+                    agreeGroup("refuse");
                 }
             });
 
