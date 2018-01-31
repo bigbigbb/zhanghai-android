@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -19,6 +20,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.caishi.zhanghai.im.bean.FriendAllReturnBean;
+import com.caishi.zhanghai.im.bean.GroupInfoReturnBean;
+import com.caishi.zhanghai.im.bean.GroupMembersReturnBean;
+import com.caishi.zhanghai.im.bean.QuitGroupBean;
 import com.caishi.zhanghai.im.db.BlackList;
 import com.caishi.zhanghai.im.db.BlackListDao;
 import com.caishi.zhanghai.im.db.DBManager;
@@ -29,6 +33,8 @@ import com.caishi.zhanghai.im.db.GroupMemberDao;
 import com.caishi.zhanghai.im.db.Groups;
 import com.caishi.zhanghai.im.db.GroupsDao;
 import com.caishi.zhanghai.im.db.UserInfoBean;
+import com.caishi.zhanghai.im.net.CallBackJson;
+import com.caishi.zhanghai.im.net.SocketClient;
 import com.caishi.zhanghai.im.server.SealAction;
 import com.caishi.zhanghai.im.server.network.async.AsyncTaskManager;
 import com.caishi.zhanghai.im.server.network.async.OnDataListener;
@@ -41,6 +47,7 @@ import com.caishi.zhanghai.im.server.response.GetGroupResponse;
 import com.caishi.zhanghai.im.server.response.GetTokenResponse;
 import com.caishi.zhanghai.im.server.utils.NLog;
 import com.caishi.zhanghai.im.server.utils.RongGenerate;
+import com.google.gson.Gson;
 
 import io.rong.common.RLog;
 import io.rong.imkit.RongIM;
@@ -364,11 +371,9 @@ public class SealUserInfoManager implements OnDataListener {
     private FriendAllReturnBean friendAllReturnBean;
 
 
-    public void  setFriendAllReturnBean(FriendAllReturnBean friendAllBean){
+    public void setFriendAllReturnBean(FriendAllReturnBean friendAllBean) {
         this.friendAllReturnBean = friendAllBean;
     }
-
-
 
 
     private boolean fetchFriends() throws HttpException {
@@ -618,6 +623,99 @@ public class SealUserInfoManager implements OnDataListener {
                         NLog.d(TAG, "getGroupMember occurs HttpException e=" + e.toString() + "groupID=" + groupID);
                         return;
                     }
+                }
+            }
+        });
+    }
+
+    public void getGroupInfo1(final String fromConversationId) {
+        final QuitGroupBean groupBean = new QuitGroupBean();
+        groupBean.setK("info");
+        groupBean.setM("group");
+        groupBean.setRid(String.valueOf(System.currentTimeMillis()));
+        QuitGroupBean.VBean vBean = new QuitGroupBean.VBean();
+        vBean.setGroupId(fromConversationId);
+        groupBean.setV(vBean);
+        String msg = new Gson().toJson(groupBean);
+
+        SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
+            @Override
+            public void returnJson(String json) {
+                Log.e("json", json);
+                GroupInfoReturnBean groupInfoReturnBean = new Gson().fromJson(json, GroupInfoReturnBean.class);
+//                    Message message = new Message();
+//                    message.what = 1;
+//                    message.obj = groupInfoReturnBean;
+//                    handler.sendMessage(message);
+                if (null != groupInfoReturnBean) {
+                    GetGroupInfoResponse.ResultEntity groupInfo = new GetGroupInfoResponse.ResultEntity();
+                    groupInfo.setCreatorId(groupInfoReturnBean.getData().getCreatorId());
+                    groupInfo.setId(groupInfoReturnBean.getData().getId());
+                    groupInfo.setMemberCount(groupInfoReturnBean.getData().getMemberCount());
+                    groupInfo.setName(groupInfoReturnBean.getData().getName());
+                    groupInfo.setPortraitUri(groupInfoReturnBean.getData().getPortraitUri());
+                    if (groupInfo != null) {
+                        String role = groupInfo.getCreatorId().equals(RongIM.getInstance().getCurrentUserId()) ? "0" : "1";
+                        syncAddGroup(new Groups(fromConversationId,
+                                groupInfo.getName(),
+                                groupInfo.getPortraitUri(),
+                                role));
+                    }
+
+                    getGroupMember1(fromConversationId);
+                }
+
+            }
+        });
+    }
+
+    public void getGroupMember1(final String fromConversationId) {
+        final QuitGroupBean groupBean = new QuitGroupBean();
+        groupBean.setK("members");
+        groupBean.setM("group");
+        groupBean.setRid(String.valueOf(System.currentTimeMillis()));
+        QuitGroupBean.VBean vBean = new QuitGroupBean.VBean();
+        vBean.setGroupId(fromConversationId);
+        groupBean.setV(vBean);
+        String msg = new Gson().toJson(groupBean);
+
+        SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
+            @Override
+            public void returnJson(String json) {
+                Log.e("json", json);
+                GroupMembersReturnBean groupMembersReturnBean = new Gson().fromJson(json, GroupMembersReturnBean.class);
+                if (null != groupMembersReturnBean) {
+                    Message message = new Message();
+                    message.obj = groupMembersReturnBean;
+                    message.what = 2;
+//                    handler.sendMessage(message);
+                        List<GetGroupMemberResponse.ResultEntity> list = new ArrayList<>();
+                    List<GroupMembersReturnBean.DataBean> dataBeanList = groupMembersReturnBean.getData();
+                    if (dataBeanList != null && dataBeanList.size() > 0) {
+                        GetGroupMemberResponse.ResultEntity groupMember = null;
+                        for (GroupMembersReturnBean.DataBean dataBean : dataBeanList) {
+                            groupMember = new GetGroupMemberResponse.ResultEntity();
+                            groupMember.setCreatedAt(dataBean.getCreatedAt());
+                            groupMember.setDisplayName(dataBean.getDisplayName());
+                            groupMember.setRole(dataBean.getRole());
+                            GetGroupMemberResponse.ResultEntity.UserEntity userEntity  = new GetGroupMemberResponse.ResultEntity.UserEntity();
+                            userEntity.setPortraitUri(dataBean.getUser().getPortraitUri());
+                            userEntity.setId(dataBean.getUser().getId());
+                            userEntity.setNickname(dataBean.getUser().getNickname());
+                            groupMember.setUser(userEntity);
+                            list.add(groupMember);
+
+                        }
+                        if (list != null && list.size() > 0) {
+                            syncDeleteGroupMembers(fromConversationId);
+                            addGroupMembers(list, fromConversationId);
+                        }
+                    }
+
+
+                }else {
+                    setGetAllUserInfoWithPartGroupMembersState();
+                    sp.edit().putInt("getAllUserInfoState", mGetAllUserInfoState).apply();
                 }
             }
         });
@@ -967,7 +1065,7 @@ public class SealUserInfoManager implements OnDataListener {
      * @param callback 获取好友信息的回调
      */
     public void getFriends(final ResultCallback<List<Friend>> callback) {
-        if(null!=mWorkHandler){
+        if (null != mWorkHandler) {
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {

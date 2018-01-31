@@ -3,6 +3,8 @@ package io.rong.callkit;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +24,6 @@ import io.rong.calllib.RongCallCommon;
 import io.rong.imkit.RongContext;
 import io.rong.imkit.widget.AsyncImageView;
 import io.rong.imlib.model.UserInfo;
-
 /**
  * Created by weiqinxiao on 16/3/15.
  */
@@ -130,6 +131,7 @@ public class CallSelectMemberActivity extends Activity {
             });
         }
     }
+
 
     @Override
     protected void onDestroy() {

@@ -280,8 +280,8 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
                 }
                 if (groupNotificationMessage.getOperation().equals("Create")) {
                     //创建群组
-                    SealUserInfoManager.getInstance().getGroups(groupID);
-                    SealUserInfoManager.getInstance().getGroupMember(groupID);
+                    SealUserInfoManager.getInstance().getGroupInfo1(groupID);
+//                    SealUserInfoManager.getInstance().getGroupMember1(groupID);
                 } else if (groupNotificationMessage.getOperation().equals("Dismiss")) {
                     //解散群组
                     hangUpWhenQuitGroup();      //挂断电话

@@ -339,23 +339,31 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         String is_join_via_pay = groupInfoBean.getIs_join_via_pay();
         if (join_direct == 1) {
             sw_group_one.setChecked(true);
+
         } else {
             sw_group_one.setChecked(false);
+            isOpen1 = true;
         }
         if (is_view_each == 1) {
+
             sw_group_three.setChecked(true);
         } else {
             sw_group_three.setChecked(false);
+            isOpen3 =true;
         }
         if (is_invite_each == 1) {
+
             sw_group_four.setChecked(true);
         } else {
+            isOpen4 = true;
             sw_group_four.setChecked(false);
         }
         if (is_join_via_pay.equals("0.00")) {
             sw_group_two.setChecked(false);
             ll_group_two_two.setVisibility(View.GONE);
+            isOpen2 = true;
         } else {
+
             sw_group_two.setChecked(true);
             ll_group_two_two.setVisibility(View.VISIBLE);
         }
@@ -679,7 +687,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
                     break;
                 case 6:
                     BaseReturnBean baseReturnBean6 = (BaseReturnBean) msg.obj;
-                    NToast.longToast(getApplication(), baseReturnBean6.getDesc());
+                    NToast.shortToast(getApplication(), baseReturnBean6.getDesc());
                     LoadDialog.dismiss(mContext);
                     if (baseReturnBean6.getV().equals("ok")) {
 
@@ -1367,7 +1375,8 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
                 if (intent != null) {
                     String groupID = intent.getStringExtra("String");
                     if (groupID != null && groupID.equals(fromConversationId))
-                        getGroupMembers();
+//                        getGroupMembers();
+                        getGroupMember();
                 }
             }
         });

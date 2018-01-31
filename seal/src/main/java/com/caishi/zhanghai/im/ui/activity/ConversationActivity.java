@@ -25,11 +25,18 @@ import java.util.Locale;
 import com.caishi.zhanghai.im.R;
 import com.caishi.zhanghai.im.SealAppContext;
 import com.caishi.zhanghai.im.SealUserInfoManager;
+import com.caishi.zhanghai.im.bean.GroupMembersReturnBean;
+import com.caishi.zhanghai.im.bean.QuitGroupBean;
 import com.caishi.zhanghai.im.db.GroupMember;
+import com.caishi.zhanghai.im.net.CallBackJson;
+import com.caishi.zhanghai.im.net.SocketClient;
 import com.caishi.zhanghai.im.server.utils.NLog;
 import com.caishi.zhanghai.im.server.utils.NToast;
+import com.caishi.zhanghai.im.server.widget.LoadDialog;
 import com.caishi.zhanghai.im.ui.fragment.ConversationFragmentEx;
 import com.caishi.zhanghai.im.ui.widget.LoadingDialog;
+import com.google.gson.Gson;
+
 import io.rong.imkit.RongIM;
 import io.rong.imkit.fragment.UriFragment;
 import io.rong.imkit.userInfoCache.RongUserInfoManager;
@@ -183,7 +190,8 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
         RongCallKit.setGroupMemberProvider(new RongCallKit.GroupMembersProvider() {
             @Override
             public ArrayList<String> getMemberList(String groupId, final RongCallKit.OnGroupMembersResult result) {
-                getGroupMembersForCall();
+//                getGroupMembersForCall();
+                getGroupMember();
                 mCallMemberResult = result;
                 return null;
             }
@@ -590,6 +598,68 @@ public class ConversationActivity extends BaseActivity implements View.OnClickLi
             }
         });
     }
+
+    private void getGroupMember() {
+        QuitGroupBean groupBean = new QuitGroupBean();
+        groupBean.setK("members");
+        groupBean.setM("group");
+        groupBean.setRid(String.valueOf(System.currentTimeMillis()));
+        QuitGroupBean.VBean vBean = new QuitGroupBean.VBean();
+        vBean.setGroupId(mTargetId);
+        groupBean.setV(vBean);
+        String msg = new Gson().toJson(groupBean);
+
+        SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
+            @Override
+            public void returnJson(String json) {
+                Log.e("json", json);
+                GroupMembersReturnBean groupMembersReturnBean = new Gson().fromJson(json, GroupMembersReturnBean.class);
+                if (null != groupMembersReturnBean) {
+                    Message message = new Message();
+                    message.obj = groupMembersReturnBean;
+                    message.what = 2;
+                    handler.sendMessage(message);
+                }
+            }
+        });
+    }
+
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case 2:
+                    GroupMembersReturnBean groupMembersReturnBean = (GroupMembersReturnBean) msg.obj;
+                    if (groupMembersReturnBean.getV().equals("ok")) {
+                        List<GroupMembersReturnBean.DataBean> dataBeanList = groupMembersReturnBean.getData();
+                        if (dataBeanList != null && dataBeanList.size() > 0) {
+                            List<GroupMember> groupMembers = new ArrayList<>();
+                            GroupMember groupMember = null;
+                            for (GroupMembersReturnBean.DataBean dataBean : dataBeanList) {
+                                groupMember = new GroupMember(dataBean.getUser().getId(), dataBean.getUser().getNickname(), Uri.parse((String) dataBean.getUser().getPortraitUri()));
+
+                                groupMembers.add(groupMember);
+                            }
+
+                            ArrayList<String> userIds = new ArrayList<>();
+                            if (groupMembers != null) {
+                                for (GroupMember groupMember1 : groupMembers) {
+                                    if (groupMember != null) {
+                                        userIds.add(groupMember1.getUserId());
+                                    }
+                                }
+                            }
+                            mCallMemberResult.onGotMemberList(userIds);
+                        }else {
+                            mCallMemberResult.onGotMemberList(null);
+                        }
+                    }
+
+                    break;
+            }
+        }
+    };
     //CallKit end 4
 
     @Override
