@@ -437,6 +437,7 @@ public class SealUserInfoManager implements OnDataListener {
         return false;
     }
 
+
     /**
      * 从server获取群组信息,群组create时使用
      * 注意这个接口同其它getGroups接口的区别,此方法只是写数据库不返回数据
@@ -638,10 +639,12 @@ public class SealUserInfoManager implements OnDataListener {
         groupBean.setV(vBean);
         String msg = new Gson().toJson(groupBean);
 
+        Log.e("test1","进来了~~~~");
         SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
             @Override
             public void returnJson(String json) {
                 Log.e("json", json);
+                Log.e("test1","进来了~~~~"+json);
                 GroupInfoReturnBean groupInfoReturnBean = new Gson().fromJson(json, GroupInfoReturnBean.class);
 //                    Message message = new Message();
 //                    message.what = 1;
@@ -1585,6 +1588,43 @@ public class SealUserInfoManager implements OnDataListener {
                 }
             });
         }
+    }
+
+    public void getGroupInfo(final String groupID, final ResultCallback<Groups> callback) {
+        QuitGroupBean groupBean = new QuitGroupBean();
+        groupBean.setK("info");
+        groupBean.setM("group");
+        groupBean.setRid(String.valueOf(System.currentTimeMillis()));
+        QuitGroupBean.VBean vBean = new QuitGroupBean.VBean();
+        vBean.setGroupId(groupID);
+        groupBean.setV(vBean);
+        String msg = new Gson().toJson(groupBean);
+
+        SocketClient.getInstance().sendMessage(msg, new CallBackJson() {
+            @Override
+            public void returnJson(String json) {
+                Log.e("json", json);
+                GroupInfoReturnBean groupInfoReturnBean = new Gson().fromJson(json, GroupInfoReturnBean.class);
+                if (null != groupInfoReturnBean) {
+//                    NToast.shortToast(getApplication(), groupInfoReturnBean.getDesc());
+                    if (groupInfoReturnBean.getV().equals("ok")) {
+                        GroupInfoReturnBean.DataBean groupInfoBean = groupInfoReturnBean.getData();
+                        Groups mGroup = new Groups();
+                        if (!TextUtils.isEmpty(groupInfoBean.getPortraitUri())) {
+                            mGroup.setPortraitUri(groupInfoBean.getPortraitUri());
+                        }
+                        mGroup.setDisplayName(groupInfoBean.getName());
+                        mGroup.setGroupsId(groupInfoBean.getId());
+                        mGroup.setRole(groupInfoBean.getCreatorId());
+
+                        if (callback != null) {
+                            callback.onCallback(mGroup);
+                        }
+                    }
+                }
+
+            }
+        });
     }
 
     /**

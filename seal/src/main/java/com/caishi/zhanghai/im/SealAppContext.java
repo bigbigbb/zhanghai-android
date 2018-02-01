@@ -396,15 +396,15 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
 
     @Override
     public Group getGroupInfo(String s) {
-        //return GroupInfoEngine.getInstance(mContext).startEngine(s);
+//        return GroupInfoEngine.getInstance(mContext).startEngine(s);
         SealUserInfoManager.getInstance().getGroupInfo(s);
         return null;
     }
 
     @Override
     public GroupUserInfo getGroupUserInfo(String groupId, String userId) {
-        //return GroupUserInfoEngine.getInstance(mContext).startEngine(groupId, userId);
-        return null;
+        return GroupUserInfoEngine.getInstance(mContext).startEngine(groupId, userId);
+//        return null;
     }
 
 

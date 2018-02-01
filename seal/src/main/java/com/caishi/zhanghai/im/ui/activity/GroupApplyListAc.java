@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -48,7 +49,7 @@ import io.rong.imageloader.core.ImageLoader;
 
 public class GroupApplyListAc extends BaseActivity implements View.OnClickListener {
     private ListView mLvApplyList;
-    private RadioButton rb_select_all;
+    private CheckBox rb_select_all;
     private Button btn_group_agree,btn_group_ingore,btn_group_reject;
     private String fromConversationId;
 
@@ -62,7 +63,7 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
 
     private void initData() {
         mLvApplyList = (ListView) findViewById(R.id.lv_group_apply_list);
-        rb_select_all = (RadioButton) findViewById(R.id.rb_select_all);
+        rb_select_all = (CheckBox) findViewById(R.id.rb_select_all);
         btn_group_agree = (Button) findViewById(R.id.btn_group_agree);
         btn_group_ingore = (Button) findViewById(R.id.btn_group_ingore);
         btn_group_reject = (Button) findViewById(R.id.btn_group_reject);
@@ -73,15 +74,21 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
-                if (b) {
-                    for (GroupApplyListReturnBean.DataBean dataBean : dataBeanList) {
-                        dataBean.setCheck(true);
+                if(null!=dataBeanList&&dataBeanList.size()>0){
+                    if (b) {
+                        for (GroupApplyListReturnBean.DataBean dataBean : dataBeanList) {
+                            dataBean.setCheck(true);
+                        }
+                    } else {
+                        for (GroupApplyListReturnBean.DataBean dataBean : dataBeanList) {
+                            dataBean.setCheck(false);
+                        }
                     }
-                } else {
-                    for (GroupApplyListReturnBean.DataBean dataBean : dataBeanList) {
-                        dataBean.setCheck(false);
-                    }
+
+                    myAdapter.setDataList(dataBeanList);
+                    myAdapter.notifyDataSetChanged();
                 }
+
 
             }
         });
@@ -189,7 +196,7 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
             switch (msg.what) {
                 case 1:
                     GroupApplyListReturnBean groupInfoReturnBean = (GroupApplyListReturnBean) msg.obj;
-                    NToast.longToast(getApplication(), groupInfoReturnBean.getDesc());
+//                    NToast.longToast(getApplication(), groupInfoReturnBean.getDesc());
                     if (null != groupInfoReturnBean.getData()) {
                         dataBeanList = groupInfoReturnBean.getData();
                         myAdapter = new MyAdapter();
@@ -213,8 +220,14 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
     private List<GroupApplyListReturnBean.DataBean> dataBeanList;
 
     private class MyAdapter extends BaseAdapter {
+        private List<GroupApplyListReturnBean.DataBean> dataList;
+
+        public void setDataList(List<GroupApplyListReturnBean.DataBean> dataList) {
+            this.dataList = dataList;
+        }
 
         GroupApplyListReturnBean.DataBean dataBean = null;
+
 
 
         @Override
@@ -233,12 +246,12 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
         }
 
         @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
+        public View getView(final  int i, View view, ViewGroup viewGroup) {
             view = getLayoutInflater().inflate(R.layout.acitivity_group_apply_item, viewGroup, false);
             SelectableRoundedImageView search_item_header = (SelectableRoundedImageView) view.findViewById(R.id.search_item_header);
             TextView search_item_name = (TextView) view.findViewById(R.id.search_item_name);
             TextView search_item_time = (TextView) view.findViewById(R.id.search_item_time);
-            RadioButton rb_select_one = (RadioButton) view.findViewById(R.id.rb_select_one);
+            CheckBox rb_select_one = (CheckBox) view.findViewById(R.id.rb_select_one);
             final Button btn_group_agree = (Button) view.findViewById(R.id.btn_group_agree);
             Button btn_group_ingore = (Button) view.findViewById(R.id.btn_group_ingore);
             Button btn_group_reject = (Button) view.findViewById(R.id.btn_group_reject);
@@ -260,6 +273,8 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
                         btn_group_agree.setText("同意进群");
                     }
                 }
+                    rb_select_one.setChecked(dataBean.isCheck());
+
 
             }
 
@@ -268,11 +283,16 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if (b) {
-                        dataBean.setCheck(true);
-                        b = !b;
+                        dataBeanList.get(i).setCheck(true);
+
                     } else {
-                        dataBean.setCheck(false);
-                        b = !b;
+                        dataBeanList.get(i).setCheck(false);
+                    }
+                    dataBeanList.set(i,dataBeanList.get(i));
+                    if(isAllSelect()){
+                        rb_select_all.setChecked(true);
+                    }else {
+                        rb_select_all.setChecked(false);
                     }
                 }
             });
@@ -371,4 +391,15 @@ public class GroupApplyListAc extends BaseActivity implements View.OnClickListen
             }
         }
     }
+
+    private boolean isAllSelect(){
+        boolean isAll = true;
+        for (GroupApplyListReturnBean.DataBean dataBean :dataBeanList){
+            if(!dataBean.isCheck()){
+                isAll = false;
+            }
+        }
+        return isAll;
+    }
+
 }

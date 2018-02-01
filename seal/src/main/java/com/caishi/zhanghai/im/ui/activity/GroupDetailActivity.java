@@ -169,8 +169,14 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
         SealAppContext.getInstance().pushActivity(this);
 
         setGroupsInfoChangeListener();
-        getGroupInfo();
 
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getGroupInfo();
     }
 
     private void getGroupInfo() {
@@ -586,7 +592,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
                     break;
                 case 1://获取群组消息
                     GroupInfoReturnBean groupInfoReturnBean = (GroupInfoReturnBean) msg.obj;
-                    NToast.shortToast(getApplication(), groupInfoReturnBean.getDesc());
+//                    NToast.shortToast(getApplication(), groupInfoReturnBean.getDesc());
                     if (groupInfoReturnBean.getV().equals("ok")) {
                         groupInfoBean = groupInfoReturnBean.getData();
                         mGroup = new Groups();
@@ -604,7 +610,7 @@ GroupDetailActivity extends BaseActivity implements View.OnClickListener, Compou
 
                 case 2://获取群成员消息
                     GroupMembersReturnBean groupMembersReturnBean = (GroupMembersReturnBean) msg.obj;
-                    NToast.longToast(getApplication(), groupMembersReturnBean.getDesc());
+//                    NToast.longToast(getApplication(), groupMembersReturnBean.getDesc());
                     if (groupMembersReturnBean.getV().equals("ok")) {
                         LoadDialog.dismiss(mContext);
                         List<GroupMembersReturnBean.DataBean> dataBeanList = groupMembersReturnBean.getData();

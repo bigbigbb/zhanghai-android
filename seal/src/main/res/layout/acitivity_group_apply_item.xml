@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:background="@color/white"
     android:layout_height="70dp">
-    <RadioButton
-        android:visibility="gone"
+    <CheckBox
         android:layout_marginLeft="10dp"
         android:layout_centerVertical="true"
         android:gravity="center"

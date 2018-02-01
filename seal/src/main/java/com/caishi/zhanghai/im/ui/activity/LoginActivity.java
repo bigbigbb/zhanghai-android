@@ -329,7 +329,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         });
 
 
+
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
