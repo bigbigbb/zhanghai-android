@@ -284,7 +284,7 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
 //                    SealUserInfoManager.getInstance().getGroupMember1(groupID);
                 } else if (groupNotificationMessage.getOperation().equals("Dismiss")) {
                     //解散群组
-                    hangUpWhenQuitGroup();      //挂断电话
+                    hangUpWhenQuitGroup();      //挂断电话9
                     handleGroupDismiss(groupID);
                 } else if (groupNotificationMessage.getOperation().equals("Kicked")) {
                     //群组踢人
@@ -403,8 +403,8 @@ public class SealAppContext implements RongIM.ConversationListBehaviorListener,
 
     @Override
     public GroupUserInfo getGroupUserInfo(String groupId, String userId) {
-        return GroupUserInfoEngine.getInstance(mContext).startEngine(groupId, userId);
-//        return null;
+//        return GroupUserInfoEngine.getInstance(mContext).startEngine(groupId, userId);
+        return null;
     }
 
 

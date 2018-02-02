@@ -658,7 +658,7 @@ public class SealUserInfoManager implements OnDataListener {
                     groupInfo.setName(groupInfoReturnBean.getData().getName());
                     groupInfo.setPortraitUri(groupInfoReturnBean.getData().getPortraitUri());
                     if (groupInfo != null) {
-                        String role = groupInfo.getCreatorId().equals(RongIM.getInstance().getCurrentUserId()) ? "0" : "1";
+                        String role = groupInfo.getCreatorId().equals(RongIM.getInstance().getCurrentUserId()) ? "1" : "0";
                         syncAddGroup(new Groups(fromConversationId,
                                 groupInfo.getName(),
                                 groupInfo.getPortraitUri(),
